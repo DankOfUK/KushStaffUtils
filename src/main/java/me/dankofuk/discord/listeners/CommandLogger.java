@@ -76,7 +76,7 @@ public class CommandLogger extends ListenerAdapter {
                 playerHeadUrl = "https://crafatar.com/avatars/" + playerUuid + "?overlay=head";
             }
         } catch (IOException|org.json.simple.parser.ParseException e) {
-            // Handle the exception
+            Bukkit.getLogger().log(Level.WARNING, "[DiscordLogger] Error while getting playerHeadUrl: ", e);
         }
         return playerHeadUrl;
     }
