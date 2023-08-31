@@ -59,7 +59,7 @@ public class ReportCommand implements Listener, CommandExecutor {
         String reportedPlayerName = args[0];
         String reportReason = String.join(" ", Arrays.<CharSequence>copyOfRange((CharSequence[])args, 1, args.length));
         long currentTime = System.currentTimeMillis();
-        long lastReportTime = ((Long)this.cooldowns.getOrDefault(player.getUniqueId(), Long.valueOf(0L))).longValue();
+        long lastReportTime = ((Long)this.cooldowns.getOrDefault(player.getUniqueId(), 0L)).longValue();
         long timeRemaining = (lastReportTime + this.reportCooldown * 1000L - currentTime) / 1000L;
         if (timeRemaining > 0L) {
             String cooldownMessage = "&cPlease wait " + timeRemaining + " seconds before submitting another report.";
@@ -67,7 +67,7 @@ public class ReportCommand implements Listener, CommandExecutor {
             return true;
         }
         sendWebhook(player, reportedPlayerName, reportReason);
-        this.cooldowns.put(player.getUniqueId(), Long.valueOf(currentTime));
+        this.cooldowns.put(player.getUniqueId(), currentTime);
         player.sendMessage(ColorUtils.translateColorCodes(this.reportSentMessage));
         return true;
     }
@@ -90,13 +90,10 @@ public class ReportCommand implements Listener, CommandExecutor {
                 connection.getResponseMessage();
             } catch (MalformedURLException e) {
                 Bukkit.getLogger().warning("[ReportWebhook] Invalid webhook URL specified: " + this.ReportWebhookUrl);
-                e.printStackTrace();
             } catch (ProtocolException e) {
                 Bukkit.getLogger().warning("[ReportWebhook] Invalid protocol specified in webhook URL: " + this.ReportWebhookUrl);
-                e.printStackTrace();
             } catch (IOException e) {
                 Bukkit.getLogger().warning("[ReportWebhook] Error sending message to Discord webhook.");
-                e.printStackTrace();
             }
         });
     }
