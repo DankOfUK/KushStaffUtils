@@ -67,8 +67,6 @@ public class LogsCommand extends ListenerAdapter {
                 } else {
                     event.reply("Log file for " + username + " does not exist.").setEphemeral(true).queue();
                 }
-            } else {
-                return;
             }
         }
     }

@@ -137,8 +137,7 @@ public class SuggestionCommand extends ListenerAdapter implements CommandExecuto
 
 
 
-    public void reloadConfigOptions(DiscordBot discordBot, String channelId, String threadId, String suggestionMessage,
-                                    String noPermissionMessage, String suggestionUsageMessage, String responseMessage, long cooldown, String title, String description, String footer, Color color, String thumbnailUrl) {
+    public void reloadConfigOptions(DiscordBot discordBot, String channelId, String threadId, String suggestionMessage, String noPermissionMessage, String suggestionUsageMessage, String responseMessage, long cooldown, String title, String description, String footer, Color color, String thumbnailUrl) {
         this.discordBot = discordBot;
         this.channelId = channelId;
         this.threadId = threadId;
@@ -152,5 +151,5 @@ public class SuggestionCommand extends ListenerAdapter implements CommandExecuto
         this.footer = footer;
         this.color = color;
         this.thumbnailUrl = thumbnailUrl;
-            }
+    }
 }
