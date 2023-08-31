@@ -18,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -144,7 +145,7 @@ public class DiscordBot extends ListenerAdapter {
             // Cancel any tasks registered by the bot
             Bukkit.getScheduler().getPendingTasks().stream()
                     .filter(task -> task.getOwner() == botTask)
-                    .forEach(task -> task.cancel());
+                    .forEach(BukkitTask::cancel);
         }
     }
 
