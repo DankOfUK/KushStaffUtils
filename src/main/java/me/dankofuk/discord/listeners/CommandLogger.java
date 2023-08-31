@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 public class CommandLogger extends ListenerAdapter {
     private List<String> messageFormats;
@@ -96,35 +97,23 @@ public class CommandLogger extends ListenerAdapter {
                     String message = messages.get(i);
                     String embedTitle = embedTitles.get(i);
 
-                    if (!isJavaPlayer(playerHeadUrl)) {
-                        // If it's a Bedrock player, remove the thumbnail
-                        if (logAsEmbed) {
-                            EmbedBuilder embedBuilder = new EmbedBuilder();
-                            embedBuilder.setTitle(embedTitle);
-                            embedBuilder.setDescription(message);
-                            channel.sendMessageEmbeds(embedBuilder.build()).queue();
-                        } else {
-                            channel.sendMessage(message).queue();
-                        }
-                    } else {
-                        // For Java players, add the thumbnail
-                        if (logAsEmbed) {
-                            EmbedBuilder embedBuilder = new EmbedBuilder();
-                            embedBuilder.setTitle(embedTitle);
-                            embedBuilder.setDescription(message);
+                    if (logAsEmbed) {
+                        EmbedBuilder embedBuilder = new EmbedBuilder();
+                        embedBuilder.setTitle(embedTitle);
+                        embedBuilder.setDescription(message);
+                        // If it is a Java player, add the thumbnail
+                        if (!isJavaPlayer(playerHeadUrl)) {
                             embedBuilder.setThumbnail(playerHeadUrl);
-                            channel.sendMessageEmbeds(embedBuilder.build()).queue();
-                        } else {
-                            channel.sendMessage(message).queue();
                         }
+                        channel.sendMessageEmbeds(embedBuilder.build()).queue();
+                    } else {
+                        channel.sendMessage(message).queue();
                     }
                 }
             } catch (NumberFormatException e) {
-                Bukkit.getLogger().warning("[DiscordLogger] Invalid log channel ID specified: " + logChannelId);
-                e.printStackTrace();
+                Bukkit.getLogger().log(Level.WARNING, "[DiscordLogger] Invalid log channel ID specified: ", e);
             } catch (Exception e) {
-                Bukkit.getLogger().warning("[DiscordLogger] Error sending message to Discord.");
-                e.printStackTrace();
+                Bukkit.getLogger().log(Level.WARNING, "[DiscordLogger] Error sending message to Discord.", e);
             }
         });
     }
