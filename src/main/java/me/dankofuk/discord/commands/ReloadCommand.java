@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
+import java.util.List;
 
 public class ReloadCommand extends ListenerAdapter {
 
@@ -42,12 +43,18 @@ public class ReloadCommand extends ListenerAdapter {
     private String noPlayersTitle;
     private boolean requireAdminRole;
     private boolean logsCommandRequiresAdminRole;
+    private List<String> ignoredCommands;
+    private List<String> whitelistCommands;
+    private boolean whitelistMode;
+    private String serverName;
+    private List<String> messageFormats;
+    private List<String> embedTitleFormats;
 
     public DiscordBot getDiscordBot() {
         return discordBot;
     }
 
-    public ReloadCommand(DiscordBot discordBot, FileConfiguration config, String logChannelId, boolean logAsEmbed, String titleFormat, String footerFormat, String listThumbnailUrl, String noPlayersTitle, boolean requireAdminRole, boolean logsCommandRequiresAdminRole) {
+    public ReloadCommand(DiscordBot discordBot, FileConfiguration config, String logChannelId, boolean logAsEmbed, String titleFormat, String footerFormat, String listThumbnailUrl, String noPlayersTitle, boolean requireAdminRole, boolean logsCommandRequiresAdminRole, List<String> ignoredCommands, List<String> whitelistCommands, boolean whitelistMode, String serverName, List<String> messageFormats, List<String> embedTitleFormats) {
         this.discordBot = discordBot;
         this.config = config;
         this.botTask = discordBot.botTask;
@@ -64,6 +71,12 @@ public class ReloadCommand extends ListenerAdapter {
         this.noPlayersTitle = noPlayersTitle;
         this.requireAdminRole = requireAdminRole;
         this.logsCommandRequiresAdminRole = logsCommandRequiresAdminRole;
+        this.ignoredCommands = ignoredCommands;
+        this.whitelistCommands = whitelistCommands;
+        this.whitelistMode = whitelistMode;
+        this.serverName = serverName;
+        this.messageFormats = messageFormats;
+        this.embedTitleFormats = embedTitleFormats;
     }
 
     @Override
@@ -84,21 +97,29 @@ public class ReloadCommand extends ListenerAdapter {
                 String format = config.getString("bot.discord_to_game_format");
                 String discordToken = config.getString("bot.discord_token");
                 boolean discordBotEnabled = config.getBoolean("bot.enabled");
+                String adminRoleID = config.getString("bot.adminRoleID");
                 String discordActivity = config.getString("bot.discord_activity");
                 String ServerStatusChannelID = config.getString("serverstatus.channel_id");
-                String logChannelId = config.getString("bot.command_log_channel_id");
-                boolean logAsEmbed = config.getBoolean("bot.command_log_logAsEmbed");
                 String titleFormat = config.getString("bot.listplayers_title_format");
                 String footerFormat = config.getString("bot.listplayers_footer_format");
                 String listThumbnailUrl = config.getString("bot.listplayers_thumbnail_url");
                 String noPlayersTitle = config.getString("bot.listplayers_no_players_online_title");
                 boolean requireAdminRole = config.getBoolean("bot.listplayers_requireAdminRole");
                 boolean logsCommandRequiresAdminRole = config.getBoolean("bot.logsCommand_requireAdminRole");
+                // Command Logger
+                boolean logAsEmbed = config.getBoolean("commandlogger.logAsEmbed");
+                String logChannelId = config.getString("commandlogger.channel_id");
+                List<String> ignoredCommands = config.getStringList("ignored_commands");
+                List<String> whitelistCommands = config.getStringList("whitelisted_commands");
+                boolean whitelistMode = config.getBoolean("whitelist_mode_enabled");
+                String serverName = config.getString("commandlogger.server_name");
+                List<String> messageFormats = config.getStringList("commandlogger.message_formats");
+                List<String> embedTitleFormats = config.getStringList("commandlogger.title_formats");
                 Server minecraftServer = Bukkit.getServer();
                 Bukkit.getScheduler().getPendingTasks().stream()
                         .filter(task -> task.getOwner() == botTask)
                         .forEach(BukkitTask::cancel);
-                discordBot.reloadDiscordConfig(discordToken, discordBotEnabled, minecraftServer, adminRoleID, discordActivity, botTask, config, ServerStatusChannelID, logChannelId, logAsEmbed, titleFormat, footerFormat, listThumbnailUrl, noPlayersTitle, requireAdminRole, logsCommandRequiresAdminRole);
+                discordBot.reloadDiscordConfig(discordToken, discordBotEnabled, minecraftServer, adminRoleID, discordActivity, botTask, config, ServerStatusChannelID, titleFormat, footerFormat, listThumbnailUrl, noPlayersTitle, requireAdminRole, logsCommandRequiresAdminRole, ignoredCommands, whitelistCommands, whitelistMode, serverName, messageFormats, embedTitleFormats, logChannelId, logAsEmbed);
                 discordBot.stop();
 
                 // Reload config strings
@@ -114,6 +135,12 @@ public class ReloadCommand extends ListenerAdapter {
                 this.listThumbnailUrl = listThumbnailUrl;
                 this.noPlayersTitle = listThumbnailUrl;
                 this.requireAdminRole = requireAdminRole;
+                this.ignoredCommands = ignoredCommands;
+                this.whitelistCommands = whitelistCommands;
+                this.whitelistMode = whitelistMode;
+                this.serverName = serverName;
+                this.messageFormats = messageFormats;
+                this.embedTitleFormats = embedTitleFormats;
 
                 EmbedBuilder stoppedEmbed = new EmbedBuilder();
                 stoppedEmbed.setColor(Color.RED);
@@ -132,7 +159,7 @@ public class ReloadCommand extends ListenerAdapter {
                 startedEmbed.setTitle("Bot started!");
                 startedEmbed.setDescription(">  `Reload Complete!`");
                 startedEmbed.setFooter(OffsetDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME));
-                event.replyEmbeds(startedEmbed.build()).queue();
+                event.getChannel().sendMessageEmbeds(startedEmbed.build()).queue();
             } else {
                 EmbedBuilder noPerms = new EmbedBuilder();
                 noPerms.setColor(Color.RED);

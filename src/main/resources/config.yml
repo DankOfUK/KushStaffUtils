@@ -1,4 +1,7 @@
-# Placeholders for Staff Logger Webhook
+# Placeholders
+#----------------------------------------------------------------
+#
+# Placeholders for [Command Logger]
 # %player% - Player Name
 # %command% - Command it will log
 # %server% - pulls from the config option "server_name"
@@ -8,52 +11,54 @@
 # Discord for Support: http://discord.gg/2xYgHUfubM
 
 
-#
+#----------------------------------------------------------------
 # Discord Bot Settings
-#
+#----------------------------------------------------------------
 bot:
   # Main Bot Configuration
-  enabled: true
-  discord_token: ""
-  adminRoleID: "1057520326373801995"
+  enabled: true # Enable if you want to use the [Command Logger, List Players, Discord Bot and more]
+  discord_token: "" # Discord Bot Token
+  adminRoleID: "1057520326373801995" # Role ID for admin commands
   discord_activity: "with KushStaffUtils"
 
-  # Command Logger Configuration
-  command_log_channel_id: "1067570285999570984"
-  command_log_logAsEmbed: true
-  #command_log_message_formats: (Config Example with thats not an embed or multiple lines)
-  #  - "[%time%] [`%server%`] __**%player%:**__ `%command%`"
-  command_log_message_formats:
-    - "\n:information_source: __**Player:**__\n> `%player%`\n \n:gear: __**Use Commands:**__\n> `%command%`\n \n:satellite: __**Server:**__\n> `%server%`\n \n:timer: __**Time:**__\n> %time%"
-  command_log_embed_title_formats:
-    - ":information_source: COMMAND LOGGER"
-
-  # Log Commands Configuration
+  #----------------------------------------------------------------
+  # Log Command Configuration
+  #----------------------------------------------------------------
   logsCommand_requireAdminRole: true
 
+  #----------------------------------------------------------------
   # Discord Chat 2 Game Chat Configuration
+  #----------------------------------------------------------------
   discord_to_game_enabled: true
   discord_to_game_roleIdRequired: false
   discord_to_game_roleId: "967958848369487943" #This is if roleIdRequired is true
   discord_to_game_channel_id: "1067570285999570984"
   discord_to_game_format: "&9[Discord] &c%author%: &7%message%"
 
+  #----------------------------------------------------------------
   # List Players Configuration
+  #----------------------------------------------------------------
   listplayers_requireAdminRole: false
   listplayers_no_players_online_title: "`Online Players`"
   listplayers_title_format: "Players Online `(%online%)` - %time%"
   listplayers_footer_format: "Server IP: play.example.com - Test"
   listplayers_thumbnail_url: "https://cdn.discordapp.com/avatars/265918857112322052/b047522734170c4d476370f8610b8318.png?size=1024"
 
-# Server Shutdown/Startup Logger
+#----------------------------------------------------------------
+# Server Shutdown/Startup Logger Configuration - WOIP
+#----------------------------------------------------------------
 serverstatus:
   channel_id: "1096952523585245195"
 
+#----------------------------------------------------------------
 # Enable this if you want it to log commands to a file per use! (STORED VIA UUIDS)
+#----------------------------------------------------------------
 per-user-logging:
   enabled: true # this logs in KushStaffLogger/logs
 
-
+#----------------------------------------------------------------
+# Suggestion Command Configuration
+#----------------------------------------------------------------
 suggestion:
   title: "New Suggestion from %player%"
   description: "%suggestion%"
@@ -66,9 +71,16 @@ suggestion:
   sent_message: "&aYour suggestion (%suggestion%) has been sent!"
   cooldown: 60
 
+#----------------------------------------------------------------
 # Factions Top Announcer
+#----------------------------------------------------------------
 announcer:
+  enabled: false
   webhookUrl: "your-webhook-here"
+  sendEvery: 15
+  title: "Factions Top Announcement"
+  username: "FactionsBot"
+  footer: "Factions Top Logger"
   messages:
     - "Factions Top #1: %factionstop_ftop1% - `$%factionstop_ftop1-totalworth%`"
     - "Factions Top #2: %factionstop_ftop2% - `$%factionstop_ftop2-totalworth%`"
@@ -82,33 +94,31 @@ announcer:
     - "Factions Top #10: %factionstop_ftop10% - `$%factionstop_ftop10-totalworth%`"
     - ""
     - "Join our server to compete!"
-  sendEvery: 15
-  enabled: false
-  title: "Factions Top Announcement"
-  username: "FactionsBot"
-  footer: "Factions Top Logger"
   thumbnailUrl: "https://cdn.discordapp.com/avatars/1093413225338507344/a60fa5f0a630cafb471effcf3a3e1bd8.png?size=4096"
   avatarUrl: "https://cdn.discordapp.com/avatars/1093413225338507344/a60fa5f0a630cafb471effcf3a3e1bd8.png?size=4096"
   debuggerEnabled: false #Only enabled if debugging is required
 
 
-
+#----------------------------------------------------------------
 # Player Reporting Configuration
-enabled: false # If disabled it will not work
-# Chat Reporting Webhook Lang
-webhook-url: "your-webhook-here"
-username: "OBN"
-avatar-url: "https://example.com/avatar.png"
-report-message: ":information_source: `Player Reporting:`\n> **%player%**\n \n:red_circle: `Player Reported:`\n> **%reported_player%**\n \n:books: `Reason:`\n> %reason%"
-# Chat Reporting Lang
-cooldown-seconds: 600 # seconds
-report-sent-message: "&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &fYour report has been sent!\n&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &fThank you for helping us make the server safer!"
-no-permission-message: "&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &fYou do not have permission to use this command."
-usage-message: "&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &c/report <player> <reason>\n&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &fPlease use &cImgur&f or &cYoutube&f for proof."
+#----------------------------------------------------------------
+report:
+  enabled: false # If disabled it will not work
+  # Chat Reporting Webhook Lang
+  webhookUrl: "your-webhook-here"
+  username: "OBN"
+  avatarUrl: "https://example.com/avatar.png"
+  message: ":information_source: `Player Reporting:`\n> **%player%**\n \n:red_circle: `Player Reported:`\n> **%reported_player%**\n \n:books: `Reason:`\n> %reason%"
+  # Chat Reporting Lang
+  cooldown: 600 # seconds
+  sent-message: "&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &fYour report has been sent!\n&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &fThank you for helping us make the server safer!"
+  no-permission-message: "&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &fYou do not have permission to use this command."
+  command-usage: "&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &c/report <player> <reason>\n&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &fPlease use &cImgur&f or &cYoutube&f for proof."
 
 
-
-# Join Leave Webhooks Logger
+#----------------------------------------------------------------
+# Join - Leave Message Logger Configuration
+#----------------------------------------------------------------
 isEnabled: false
 joinWebhookUrl: "your-webhook-here"
 leaveWebhookUrl: "your-webhook-here"
@@ -128,53 +138,56 @@ leaveMessage:
   - "> :computer: Website > www.servername.net"
   - "> :department_store: Store > store.servername.net"
 # If enabled it will send as a embed message!
-useEmbed: true
-# Gets the Server Name for the %server% placeholder
-server_name: "ONEBLOCK NATION"
 
+#----------------------------------------------------------------
+# Command Logger Configuration
+#----------------------------------------------------------------
+commandlogger:
+  # Message format for the message.
+  message_formats:
+    - "\n:information_source: __**Player:**__\n> `%player%`\n \n:gear: __**Use Commands:**__\n> `%command%`\n \n:satellite: __**Server:**__\n> `%server%`\n \n:timer: __**Time:**__\n> %time%"
+  # Title Format for the message.
+  title_formats:
+    - ":information_source: COMMAND LOGGER"
+  author_message: "%player%"
+  # If enabled it will send as an embed message!
+  logAsEmbed: true
+  # Channel ID for the logging channel
+  channel_id: "CHANNEL_ID_HERE"
+  # Gets the Server Name for the %server% placeholder
+  server_name: "Example Server"
 
+  #----------------------------------------------------------------
+  # Command Logger Whitelist Mode Configuration
+  #----------------------------------------------------------------
+  # If false it will log all commands (ignored_commands wont ever be logged)
+  # If true it will only log the command in the whitelist_commands (ignored_commands wont ever be logged)
+  whitelist_mode_enabled: false
+  # Commands the will be logged if set to true (ignored_commands wont ever be logged)
+  whitelisted_commands:
+    - "/ipmute"
+    - "/ipban"
+    - "/kill"
 
-# Reload Config Config
-#
+  # Commands the command logger will never log
+  ignored_commands:
+    - "/pin"
+    - "/register"
+    - "/login"
+    - "/password"
+
+#----------------------------------------------------------------
+# Messages Config
+#----------------------------------------------------------------
 # Change the no permission message!
 no_permission: "&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &fYou do not have permission to &c/stafflogger&f!"
 
 # Change the no permission message!
 reload_message: "&c[&c&lsᴜᴘᴘᴏʀᴛ&c] &8» &fThe config files have been reloaded!"
 
-# Commands the plugin will ingore
-ignored_commands:
-  - "/pin"
-  - "/register"
-  - "/login"
-  - "/password"
-
-# If false it will log all commands (ignored_commands wont ever be logged)
-# If true it will only log the command in the whitelist_commands (ignored_commands wont ever be logged)
-whitelist_enabled: false
-# Commands the will be logged if set to true (ignored_commands wont ever be logged)
-whitelisted_commands:
-  - "/kick"
-  - "/ipmute"
-  - "/ipban"
-  - "/ban"
-  - "/tempban"
-  - "/mute"
-  - "/tempmute"
-  - "/warn"
-  - "/clearchat"
-  - "/gmc"
-  - "/gmsp"
-  - "/co i"
-  - "/co rollback"
-  - "/co"
-  - "/irp restore"
-  - "/irp"
-  - "/invsee"
-  - "/kill"
-
-
-# Chat Webhook - BETA (LOGS GAME CHAT TO DISCORD)
+#----------------------------------------------------------------
+# Chat Webhook Configuration
+#----------------------------------------------------------------
 chatwebhook:
   enabled: false
   url: "your-webhook-here"
@@ -182,7 +195,9 @@ chatwebhook:
   avatarUrl: "https://cdn.discordapp.com/avatars/689960485495373824/19e1d85814a1a19c84e7ef0e261455a8.png?size=4096"
   message: "[%vault_groups% %player_name%]: %message%"
 
-# Configure StrikeWebhook
+#----------------------------------------------------------------
+# Strike Command Configuration
+#----------------------------------------------------------------
 strike:
   enabled: false
   webhookUrl: "your-webhook-here"
@@ -200,7 +215,9 @@ strike:
   noPermissionMessage: "&cYou do not have permission to use this command."
   usageMessage: "&cUsage: /strike <group> <amount> <reason>"
 
-# Bug Command Webhook
+#----------------------------------------------------------------
+# Bug Command Configuration
+#----------------------------------------------------------------
 bug_webhook_url: "your-webhook-here"
 bug_username: "BUG REPORT"
 bug_thumbnail: "https://cdn.discordapp.com/avatars/689960485495373824/19e1d85814a1a19c84e7ef0e261455a8.png?size=4096"

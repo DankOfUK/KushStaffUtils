@@ -5,6 +5,10 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -19,27 +23,34 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public class CommandLogger extends ListenerAdapter {
-    private List<String> messageFormats;
-    private String serverName;
-    private List<String> embedTitleFormats;
+public class CommandLogger extends ListenerAdapter implements Listener {
+    public List<String> ignoredCommands;
+    public List<String> messageFormats;
+    public String serverName;
+    public List<String> embedTitleFormats;
     public boolean logAsEmbed;
     public String logChannelId;
     public DiscordBot discordBot;
     private static CommandLogger instance;
-    public CommandLogger(DiscordBot discordBot, List<String> messageFormat, List<String> embedTitleFormat, String serverName, boolean logAsEmbed, String logChannelId) {
+    public boolean whitelistMode;
+    public List<String> whitelistCommands;
+    public FileConfiguration config;
+
+    public CommandLogger(DiscordBot discordBot, List<String> messageFormat, List<String> embedTitleFormat, String serverName, boolean logAsEmbed, String logChannelId, List<String> ignoredCommands, boolean whitelistMode, List<String> whitelistCommands) {
             this.discordBot = discordBot;
             this.messageFormats = messageFormat;
             this.serverName = serverName;
             this.embedTitleFormats = embedTitleFormat;
             this.logAsEmbed = logAsEmbed;
             this.logChannelId = logChannelId;
+            this.ignoredCommands = ignoredCommands;
+            this.whitelistMode = whitelistMode;
+            this.whitelistCommands = whitelistCommands;
             instance = this;
     }
     public static CommandLogger getInstance() {
         return instance;
     }
-
 
     public void logCommand(String command, String playerName) {
         CompletableFuture.runAsync(() -> {
