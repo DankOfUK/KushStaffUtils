@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 public class BugCommand implements Listener, CommandExecutor {
     public String bugWebhookUrl;
@@ -134,14 +135,11 @@ public class BugCommand implements Listener, CommandExecutor {
                 //    Bukkit.getLogger().warning("[BugWebhook] Bug report sent to the Discord - Response code: " + responseCode + " Response message: " + responseMessage);
                 //}
             } catch (MalformedURLException e) {
-                Bukkit.getLogger().warning("[BugWebhook] Invalid webhook URL specified: " + this.bugWebhookUrl);
-                e.printStackTrace();
+                Bukkit.getLogger().log(Level.WARNING,"[BugWebhook] Invalid webhook URL specified: " + this.bugWebhookUrl, e);
             } catch (ProtocolException e) {
-                Bukkit.getLogger().warning("[BugWebhook] Invalid protocol specified in webhook URL: " + this.bugWebhookUrl);
-                e.printStackTrace();
+                Bukkit.getLogger().log(Level.WARNING,"[BugWebhook] Invalid protocol specified in webhook URL: " + this.bugWebhookUrl, e);
             } catch (IOException e) {
-                Bukkit.getLogger().warning("[BugWebhook] Error sending message to Discord webhook.");
-                e.printStackTrace();
+                Bukkit.getLogger().log(Level.WARNING,"[BugWebhook] Error sending message to Discord webhook.", e);
             }
         });
     }
