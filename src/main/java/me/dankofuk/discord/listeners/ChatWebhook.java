@@ -1,6 +1,5 @@
 package me.dankofuk.discord.listeners;
 
-import com.google.gson.JsonObject;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,6 +13,7 @@ import org.json.simple.JSONObject;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.logging.Level;
 
 public class ChatWebhook implements Listener {
 
@@ -89,7 +89,7 @@ public class ChatWebhook implements Listener {
             // Disconnect the connection
             connection.disconnect();
         } catch (Exception e) {
-            e.printStackTrace();
+            Bukkit.getLogger().log(Level.WARNING, "[ChatLogger] Error sending message to Discord webhook:", e);
         }
     }
 }

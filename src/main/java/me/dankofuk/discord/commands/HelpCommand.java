@@ -4,6 +4,7 @@ import me.dankofuk.discord.DiscordBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -25,7 +26,7 @@ public class HelpCommand extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (event.getName().equals("help")) {
                 List<String> playerNames = discordBot.getMinecraftServer().getOnlinePlayers().stream()
-                        .map(player -> player.getName())
+                        .map(Player::getName)
                         .collect(Collectors.toList());
 
                 EmbedBuilder helpEmbed = new EmbedBuilder();

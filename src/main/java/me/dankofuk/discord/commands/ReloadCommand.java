@@ -1,18 +1,17 @@
 package me.dankofuk.discord.commands;
 
-import me.dankofuk.discord.listeners.CommandLogger;
 import me.dankofuk.discord.DiscordBot;
+import me.dankofuk.discord.listeners.CommandLogger;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -20,8 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.logging.Level;
 
 public class ReloadCommand extends ListenerAdapter {
 
@@ -76,7 +74,7 @@ public class ReloadCommand extends ListenerAdapter {
                 try {
                     config.load(new File("plugins/KushStaffUtils/config.yml"));
                 } catch (IOException | InvalidConfigurationException e) {
-                    e.printStackTrace();
+                    Bukkit.getLogger().log(Level.WARNING, "Failed to reload config.yml", e);
                 }
 
                 boolean enabled = config.getBoolean("bot.discord_to_game_enabled");
@@ -99,7 +97,7 @@ public class ReloadCommand extends ListenerAdapter {
                 Server minecraftServer = Bukkit.getServer();
                 Bukkit.getScheduler().getPendingTasks().stream()
                         .filter(task -> task.getOwner() == botTask)
-                        .forEach(task -> task.cancel());
+                        .forEach(BukkitTask::cancel);
                 discordBot.reloadDiscordConfig(discordToken, discordBotEnabled, minecraftServer, adminRoleID, discordActivity, botTask, config, ServerStatusChannelID, logChannelId, logAsEmbed, titleFormat, footerFormat, listThumbnailUrl, noPlayersTitle, requireAdminRole, logsCommandRequiresAdminRole);
                 discordBot.stop();
 
@@ -127,7 +125,7 @@ public class ReloadCommand extends ListenerAdapter {
                     discordBot.start();
                     System.out.println("[KushStaffUtils - Discord Bot] Reloading Discord Bot...");
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Bukkit.getLogger().log(Level.WARNING, "Failed to reload Discord Bot", e);
                 }
                 EmbedBuilder startedEmbed = new EmbedBuilder();
                 startedEmbed.setColor(Color.GREEN);
