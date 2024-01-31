@@ -23,10 +23,12 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +38,7 @@ public class DiscordBot extends ListenerAdapter {
     public Plugin botTask;
     public KushStaffUtils main;
     public FileConfiguration config;
+    public FileConfiguration configManager;
     public SendSyncPanel sendSyncPanel;
     public SyncStorage syncStorage;
 
@@ -53,6 +56,8 @@ public class DiscordBot extends ListenerAdapter {
     public void start() throws InterruptedException {
         if (!KushStaffUtils.getInstance().getConfig().getBoolean("bot.enabled"))
             return;
+
+        setDefaultMessages();
 
         String activityTypeStr = KushStaffUtils.getInstance().getConfig().getString("bot.discord_activity_type");
         Activity.ActivityType activityType = getActivityType(activityTypeStr);
@@ -209,10 +214,18 @@ public class DiscordBot extends ListenerAdapter {
     }
 
     public String getFactionTopCommandRoleID() {
-        return KushStaffUtils.getInstance().getConfig().getString("announcer.factionTopCommandRoleID");
+        return KushStaffUtils.getInstance().getConfig().getString("bot.factionTopCommandRoleID");
     }
 
     public SendSyncPanel getSendPanel() {
         return sendSyncPanel;
     }
+
+
+    private void setDefaultMessages() {
+        configManager.addDefault("bot.factionTopCommandRoleID", "faction-top-command-role-id");
+
+        configManager.options().copyDefaults(true);
+    }
+
 }

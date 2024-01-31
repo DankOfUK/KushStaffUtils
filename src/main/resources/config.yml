@@ -14,6 +14,7 @@ bot:
   enabled: false
   discord_token: "bot-token-here"
   adminRoleID: "ADMIN_ROLE_ID"
+  factionTopCommandRoleID: "faction-top-command-role-id"
   discord_activity: "with KushStaffUtils"
   # Activity Types
   # WATCHING, PLAYING, STREAMING, LISTENING, COMPETING
