@@ -48,6 +48,7 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
     public FileConfiguration config;
     public FileConfiguration messagesConfig;
     public FileConfiguration syncingConfig;
+    public FileConfiguration discordBotConfig;
 
     public StartStopLogger startStopLogger;
     public CommandLogger commandLogger;
@@ -88,7 +89,10 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         saveDefaultConfig();
         messagesConfig = loadMessagesConfig();
         syncingConfig = loadSyncingConfig();
+        discordBotConfig = loadBotConfig();
         setDefaultMessages();
+        setBotMessages();
+        setSyncingConfig();
 
         // Instance
         instance = this;
@@ -493,9 +497,33 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         }
     }
 
+    public void setBotMessages() {
+        discordBotConfig.addDefault("bot.factionTopCommandRoleID", "faction-top-command-role-id");
+
+        discordBotConfig.options().copyDefaults(true);
+        saveBotConfig();
+    }
+
+    public void saveBotConfig() {
+        try {
+            discordBotConfig.save(new File(getDataFolder(), "discord-bot.yml"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public FileConfiguration loadBotConfig() {
+        saveResource("discord-bot.yml", false);
+
+        return YamlConfiguration.loadConfiguration(new File(getDataFolder(), "discord-bot.yml"));
+    }
+
+
+
     public static String getCommandLoggerFolder() {
         return logsFolder;
     }
+
 
     public static KushStaffUtils getInstance() {
         return instance;
