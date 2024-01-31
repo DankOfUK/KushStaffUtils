@@ -208,8 +208,8 @@ public class DiscordBot extends ListenerAdapter {
         return KushStaffUtils.getInstance().getConfig().getString("bot.adminRoleID");
     }
 
-    public Long getFactionTopCommandRoleID() {
-        return KushStaffUtils.getInstance().getConfig().getLong("announcer.factionTopCommandRoleID");
+    public String getFactionTopCommandRoleID() {
+        return KushStaffUtils.getInstance().getConfig().getString("announcer.factionTopCommandRoleID");
     }
 
     public SendSyncPanel getSendPanel() {
