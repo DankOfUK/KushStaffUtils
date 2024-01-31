@@ -10,6 +10,7 @@ import me.dankofuk.discord.commands.SendSyncPanel;
 import me.dankofuk.discord.syncing.SyncStorage;
 import me.dankofuk.discord.commands.UnSyncCommand;
 import me.dankofuk.discord.verify.SendPanel;
+import me.leoko.advancedban.MethodInterface;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -38,7 +39,6 @@ public class DiscordBot extends ListenerAdapter {
     public Plugin botTask;
     public KushStaffUtils main;
     public FileConfiguration config;
-    public FileConfiguration configManager;
     public SendSyncPanel sendSyncPanel;
     public SyncStorage syncStorage;
 
@@ -56,8 +56,6 @@ public class DiscordBot extends ListenerAdapter {
     public void start() throws InterruptedException {
         if (!KushStaffUtils.getInstance().getConfig().getBoolean("bot.enabled"))
             return;
-
-        setDefaultMessages();
 
         String activityTypeStr = KushStaffUtils.getInstance().getConfig().getString("bot.discord_activity_type");
         Activity.ActivityType activityType = getActivityType(activityTypeStr);
@@ -220,12 +218,4 @@ public class DiscordBot extends ListenerAdapter {
     public SendSyncPanel getSendPanel() {
         return sendSyncPanel;
     }
-
-
-    private void setDefaultMessages() {
-        configManager.addDefault("bot.factionTopCommandRoleID", "faction-top-command-role-id");
-
-        configManager.options().copyDefaults(true);
-    }
-
 }
