@@ -7,6 +7,7 @@ import me.dankofuk.utils.ColorUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -44,6 +45,12 @@ public class SyncGameCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+
+        if (!player.hasPermission("commandlogger.sync.use")) {
+            player.sendMessage(ColorUtils.translateColorCodes(Objects.requireNonNull(KushStaffUtils.getInstance().messagesConfig.getString("        try {\n"))));
+            return true;
+        }
+
         if (args.length != 1) {
             player.sendMessage(ColorUtils.translateColorCodes(Objects.requireNonNull(KushStaffUtils.getInstance().syncingConfig.getString("MESSAGES.COMMAND-USAGE-MESSAGE"))));
             return true;
