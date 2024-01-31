@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -39,11 +40,12 @@ public class ReloadCommand extends ListenerAdapter {
                 } catch (IOException|org.bukkit.configuration.InvalidConfigurationException e) {
                     e.printStackTrace();
                 }
+                KushStaffUtils.getInstance().loadBotConfig();
 
                 Server minecraftServer = Bukkit.getServer();
                 Bukkit.getScheduler().getPendingTasks().stream()
                         .filter(task -> (task.getOwner() == botTask))
-                        .forEach(task -> task.cancel());
+                        .forEach(BukkitTask::cancel);
                 Bukkit.getLogger().warning("[KushStaffUtils - Discord Bot] Stopping Discord Bot...");
 
                 EmbedBuilder stoppedEmbed = new EmbedBuilder();
