@@ -5,12 +5,8 @@ import me.dankofuk.discord.commands.*;
 import me.dankofuk.discord.listeners.CommandLogger;
 import me.dankofuk.discord.listeners.DiscordChat2Game;
 import me.dankofuk.discord.listeners.StartStopLogger;
-import me.dankofuk.discord.commands.SendRewardEmbedCommand;
-import me.dankofuk.discord.commands.SendSyncPanel;
 import me.dankofuk.discord.syncing.SyncStorage;
-import me.dankofuk.discord.commands.UnSyncCommand;
 import me.dankofuk.discord.verify.SendPanel;
-import me.leoko.advancedban.MethodInterface;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -24,12 +20,10 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -81,7 +75,6 @@ public class DiscordBot extends ListenerAdapter {
 
         // Register Events/Listeners
         this.jda.addEventListener(new HelpCommand(this));
-        this.jda.addEventListener(new ReloadCommand(this));
         this.sendSyncPanel = new SendSyncPanel(this, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD"));
         this.jda.addEventListener(sendSyncPanel);
         this.jda.addEventListener(new SendRewardEmbedCommand(this, config, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
@@ -93,7 +86,6 @@ public class DiscordBot extends ListenerAdapter {
         this.jda.addEventListener(new LogsCommand(this));
         this.jda.addEventListener(new CommandLogger(this));
         this.jda.addEventListener(new DiscordChat2Game(main, config));
-        this.jda.addEventListener(new ReloadCommand(this));
         this.jda.addEventListener(new AvatarCommand());
         this.jda.addEventListener(new ServerInfoCommand());
         this.jda.addEventListener(new SendPanel(this, main));
@@ -212,7 +204,7 @@ public class DiscordBot extends ListenerAdapter {
     }
 
     public String getFactionTopCommandRoleID() {
-        return KushStaffUtils.getInstance().getConfig().getString("bot.factionTopCommandRoleID");
+        return KushStaffUtils.getInstance().discordBotConfig.getString("bot.factionTopCommandRoleID");
     }
 
     public SendSyncPanel getSendPanel() {
