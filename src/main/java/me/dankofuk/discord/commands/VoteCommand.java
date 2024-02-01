@@ -9,10 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -21,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public class VoteCommand extends ListenerAdapter {
     public DiscordBot discordBot;
@@ -58,33 +54,33 @@ public class VoteCommand extends ListenerAdapter {
             String description = String.join("\n", descriptionLines);
             Color color = Color.decode(Objects.requireNonNull(config.getString("VOTE-EMBED.COLOR")));
 
-            EmbedBuilder embedBuilder = new EmbedBuilder();
-            embedBuilder.setTitle(title);
-            embedBuilder.setDescription(description);
-            embedBuilder.setColor(color);
-            embedBuilder.setTimestamp(OffsetDateTime.now());
-            embedBuilder.setThumbnail(thumbnailUrl);
+            EmbedBuilder embedVoteBuilder = new EmbedBuilder();
+            embedVoteBuilder.setTitle(title);
+            embedVoteBuilder.setDescription(description);
+            embedVoteBuilder.setColor(color);
+            embedVoteBuilder.setTimestamp(OffsetDateTime.now());
+            embedVoteBuilder.setThumbnail(thumbnailUrl);
 
-            List<Button> buttons = new ArrayList<>();
-            Objects.requireNonNull(config.getConfigurationSection("VOTE-BUTTONS")).getKeys(false).forEach(buttonKey -> {
-                String id = buttonKey;
-                String label = config.getString("VOTE-BUTTONS." + buttonKey + ".MESSAGE");
-                buttons.add(Button.primary(id, label));
+            List<Button> voteButtons = new ArrayList<>();
+            Objects.requireNonNull(config.getConfigurationSection("VOTE-BUTTONS")).getKeys(false).forEach(voteButtonKey -> {
+                String voteLabel = config.getString("VOTE-BUTTONS." + voteButtonKey + ".MESSAGE");
+                voteButtons.add(Button.primary(voteButtonKey, Objects.requireNonNull(voteLabel)));
             });
 
-            channel.sendMessageEmbeds(embedBuilder.build()).setActionRow(buttons).queue();
+            channel.sendMessageEmbeds(embedVoteBuilder.build()).setActionRow(voteButtons).queue();
             event.reply("Vote embed with vote links sent to channel.").setEphemeral(true).queue();
         }
     }
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        String buttonId = event.getComponentId();
-        User user = event.getUser();
+        String voteButtonId = event.getComponentId();
+        User discordUser = event.getUser();
 
         FileConfiguration config = KushStaffUtils.getInstance().getConfig();
-        String voteLink = config.getString("VOTE-BUTTONS." + buttonId + ".VOTE-LINK");
-        sendUserPrivateMessage(user, voteLink, event);
+        String voteLink = config.getString("VOTE-BUTTONS." + voteButtonId + ".VOTE-LINK");
+        event.reply("The vote link has been sent to your DMs.").setEphemeral(true).queue();
+        sendUserPrivateMessage(discordUser, voteLink, event);
 
     }
 
