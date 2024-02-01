@@ -66,6 +66,7 @@ public class SendRewardEmbedCommand extends ListenerAdapter {
             String title = config.getString("REWARD-EMBED.TITLE");
             List<String> descriptionLines = config.getStringList("REWARD-EMBED.DESCRIPTION");
             String description = String.join("\n", descriptionLines);
+            String thumbnail = config.getString("REWARD-EMBED.THUMBNAIL-URL");
             Color color = Color.decode(Objects.requireNonNull(config.getString("REWARD-EMBED.COLOR")));
 
             EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -73,12 +74,12 @@ public class SendRewardEmbedCommand extends ListenerAdapter {
             embedBuilder.setDescription(description);
             embedBuilder.setColor(color);
             embedBuilder.setTimestamp(OffsetDateTime.now());
+            embedBuilder.setThumbnail(thumbnail);
 
             List<Button> buttons = new ArrayList<>();
             Objects.requireNonNull(config.getConfigurationSection("BUTTONS")).getKeys(false).forEach(buttonKey -> {
-                String id = buttonKey;
                 String label = config.getString("BUTTONS." + buttonKey + ".MESSAGE");
-                buttons.add(Button.primary(id, label));
+                buttons.add(Button.primary(buttonKey, Objects.requireNonNull(label)));
             });
 
             // Sending the message with buttons
