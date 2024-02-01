@@ -90,6 +90,7 @@ public class DiscordBot extends ListenerAdapter {
         this.jda.addEventListener(new ServerInfoCommand());
         this.jda.addEventListener(new SendPanel(this, main));
         this.jda.addEventListener(new FTopCommand(this));
+        this.jda.addEventListener(new VoteCommand(this));
     }
 
     private Activity.ActivityType getActivityType(String activityTypeStr) {
@@ -112,6 +113,7 @@ public class DiscordBot extends ListenerAdapter {
         commandsData.add(Commands.slash("sendverifypanel", "Sends the verify panel to the channel you select.").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
         commandsData.add(Commands.slash("sendsyncpanel", "Sends the sync panel to the channel you select").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
         commandsData.add(Commands.slash("sendrewardpanel", "Sends the reward panel to the channel you select").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
+        commandsData.add(Commands.slash("sendvotepanel", "Sends the vote panel to the channel you select").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
         commandsData.add(Commands.slash("unsync", "Unsync a user that has been synced").addOption(OptionType.USER, "user", "User you want to unsync"));
         commandsData.add(Commands.slash("reload", "Reloads the bot configs. (only bot related)"));
         event.getJDA().updateCommands().addCommands(commandsData).queue();
@@ -129,6 +131,7 @@ public class DiscordBot extends ListenerAdapter {
         commandsData.add(Commands.slash("sendverifypanel", "Sends the verify panel to the channel you select.").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
         commandsData.add(Commands.slash("sendsyncpanel", "Sends the sync panel to the channel you select").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
         commandsData.add(Commands.slash("sendrewardpanel", "Sends the reward panel to the channel you select").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
+        commandsData.add(Commands.slash("sendvotepanel", "Sends the vote panel to the channel you select").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
         commandsData.add(Commands.slash("unsync", "Unsync a user that has been synced").addOption(OptionType.USER, "user", "User you want to unsync"));
         commandsData.add(Commands.slash("reload", "Reloads the bot configs. (only bot related)"));
         event.getJDA().updateCommands().addCommands(commandsData).queue();
