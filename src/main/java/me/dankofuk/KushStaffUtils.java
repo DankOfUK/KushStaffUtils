@@ -1,5 +1,6 @@
 package me.dankofuk;
 
+import com.golfing8.kore.FactionsKore;
 import me.dankofuk.commands.CommandLogViewer;
 import me.dankofuk.commands.StaffUtilsCommand;
 import me.dankofuk.discord.DiscordBot;
@@ -42,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 public class KushStaffUtils extends JavaPlugin implements Listener {
     private static String logsFolder;
     private static KushStaffUtils instance;
+    private static FactionsKore factionsKore;
     private JDA jda;
     private Plugin plugin;
 
@@ -268,10 +270,14 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             getLogger().warning("AdvancedBans Logging - [Enabled]");
         }
 
-        // Syncing Feature
-        syncStorage = new SyncStorage(KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD"));
-        syncStorage.initDatabase();
-        Objects.requireNonNull(getCommand("sync")).setExecutor(new SyncGameCommand(discordBot, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
+        if (!syncingConfig.getBoolean("enabled")) {
+            getLogger().warning("Discord 2 Game Syncing - [Not Enabled]");
+        } else {
+            syncStorage = new SyncStorage(syncingConfig.getString("MYSQL.URL"), syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD"));
+            syncStorage.initDatabase();
+            Objects.requireNonNull(getCommand("sync")).setExecutor(new SyncGameCommand(discordBot, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
+            getLogger().warning("Discord 2 Game Syncing - [Enabled]");
+        }
 
         this.staffUtilsCommand = new StaffUtilsCommand();
         Objects.requireNonNull(getCommand("stafflogger")).setExecutor(this.staffUtilsCommand);
@@ -302,6 +308,7 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         Bukkit.getConsoleSender().sendMessage("[KushStaffUtils] Plugin has been disabled!");
     }
 
+
     public void reloadConfigOptions() {
         reloadConfig();
         HandlerList.unregisterAll((Listener) this);
@@ -313,6 +320,8 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         }
         // Instance Reloads
         instance = this;
+
+        syncStorage.closeConnection();
 
         // FileCommandLogger (Logging Folder)
         if (!config.getBoolean("per-user-logging.enabled")) {
@@ -527,5 +536,9 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
 
     public static KushStaffUtils getInstance() {
         return instance;
+    }
+
+    public static FactionsKore getFKoreInstance() {
+        return factionsKore;
     }
 }
