@@ -320,7 +320,11 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
     public void onDisable() {
         FileConfiguration config = getConfig();
         boolean discordBotEnabled = config.getBoolean("bot.enabled");
-        syncStorage.closeConnection();
+        if (!syncingConfig.getBoolean("enabled")) {
+
+        } else {
+            syncStorage.closeConnection();
+        }
         if (discordBotEnabled) {
             this.discordBot.stop();
             getLogger().warning("[Discord Bot] Bot has been disabled!");
