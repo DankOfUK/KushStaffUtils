@@ -15,7 +15,8 @@ import me.dankofuk.commands.SyncGameCommand;
 import me.dankofuk.discord.syncing.SyncStorage;
 import me.dankofuk.factions.FactionStrike;
 import me.dankofuk.factions.FactionsTopAnnouncer;
-import me.dankofuk.fkore.FKorePrinterLogger;
+import me.dankofuk.fkore.FKoreEnterPrinterLogger;
+import me.dankofuk.fkore.FKoreLeavePrinterLogger;
 import me.dankofuk.loggers.advancedbans.*;
 import me.dankofuk.loggers.creative.CreativeDropLogger;
 import me.dankofuk.loggers.creative.CreativeMiddleClickLogger;
@@ -85,7 +86,8 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
     // Syncing
     public SyncStorage syncStorage;
     // FKore
-    public FKorePrinterLogger printerLogger;
+    public FKoreLeavePrinterLogger printerLeaveLogger;
+    public FKoreEnterPrinterLogger printerEnterLogger;
     public FactionsKore fkore;
     public PrinterFeature printerFeature;
     public void onEnable() {
@@ -282,14 +284,21 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             Objects.requireNonNull(getCommand("sync")).setExecutor(new SyncGameCommand(discordBot, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
             getLogger().warning("Discord 2 Game Syncing - [Enabled]");
         }
-        boolean fKorePrinterEnabled = config.getBoolean("(FKORE-PRINTER-LOGGER.enabled");
-        if (!config.getBoolean("FKORE-PRINTER-LOGGER.enabled")) {
-            getLogger().info("FKore Printer Logger - [Not Enabled]");
+        if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+            getLogger().info("FKore Leave Printer Logger - [Not Enabled]");
         } else {
-            FactionsKore fkore = getFKoreInstance();
-            this.printerLogger = new FKorePrinterLogger(printerFeature, fkore);
-            getServer().getPluginManager().registerEvents(this.printerLogger, this);
-            getLogger().info("FKore Printer Logger - [Enabled]");
+            PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
+            printerLeaveLogger = new FKoreLeavePrinterLogger(printerKore, this);
+            getServer().getPluginManager().registerEvents(printerLeaveLogger, this);
+            getLogger().info("FKore Leave Printer Logger - [Enabled]");
+        }
+        if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+            getLogger().info("FKore Enter Printer Logger - [Not Enabled]");
+        } else {
+            PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
+            printerEnterLogger = new FKoreEnterPrinterLogger(printerKore, this);
+            getServer().getPluginManager().registerEvents(printerEnterLogger, this);
+            getLogger().info("FKore Enter Printer Logger - [Enabled]");
         }
         this.staffUtilsCommand = new StaffUtilsCommand();
         Objects.requireNonNull(getCommand("stafflogger")).setExecutor(this.staffUtilsCommand);
@@ -332,8 +341,6 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         }
         // Instance Reloads
         instance = this;
-
-        syncStorage.closeConnection();
 
         // FileCommandLogger (Logging Folder)
         if (!config.getBoolean("per-user-logging.enabled")) {
