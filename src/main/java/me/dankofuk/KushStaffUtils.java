@@ -260,10 +260,10 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             getLogger().warning("LiteBans Logging - [Enabled]");
         }
 
-        // AdvacnedBans Logging (Webhooks)
-        Plugin advancedBans = pluginManager.getPlugin("AdvacnedBans");
+        // Advanced Logging (Webhooks)
+        Plugin advancedBans = pluginManager.getPlugin("AdvancedBans");
         if (advancedBans == null) {
-            getLogger().warning("AdvacnedBans is not installed or enabled. This feature will not work!");
+            getLogger().warning("AdvancedBans is not installed or enabled. This feature will not work!");
         } else if (!config.getBoolean("advancedbans.enabled")) {
             getLogger().warning("AdvancedBans Logging - [Not Enabled]");
         } else {
