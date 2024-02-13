@@ -20,13 +20,13 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class SendPanel extends ListenerAdapter {
+public class SendVerifyPanel extends ListenerAdapter {
 
     public String roleID;
     public KushStaffUtils instance;
     public DiscordBot discordBot;
 
-    public SendPanel(DiscordBot discordBot, KushStaffUtils instance) {
+    public SendVerifyPanel(DiscordBot discordBot, KushStaffUtils instance) {
         this.discordBot = discordBot;
         this.instance = instance;
     }
