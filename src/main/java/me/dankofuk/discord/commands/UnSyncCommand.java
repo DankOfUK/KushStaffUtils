@@ -2,6 +2,7 @@ package me.dankofuk.discord.commands;
 
 import me.dankofuk.KushStaffUtils;
 import me.dankofuk.discord.DiscordBot;
+import me.dankofuk.discord.syncing.SyncStorage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
@@ -18,18 +19,12 @@ import java.util.Objects;
 
 public class UnSyncCommand extends ListenerAdapter {
     public DiscordBot discordBot;
-    public me.dankofuk.discord.syncing.SyncStorage syncStorage;
-    public String Url;
-    public String Username;
-    public String Password;
+    public final SyncStorage syncStorage;
 
 
-    public UnSyncCommand(DiscordBot discordBot, String Url, String Username, String Password) {
+    public UnSyncCommand(DiscordBot discordBot, SyncStorage syncStorage) {
         this.discordBot = discordBot;
-        this.Url = Url;
-        this.Username = Username;
-        this.Password = Password;
-        this.syncStorage = new me.dankofuk.discord.syncing.SyncStorage(Url, Username, Password);
+        this.syncStorage = new SyncStorage(KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD"));
     }
 
     @Override
