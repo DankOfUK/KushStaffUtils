@@ -1,6 +1,7 @@
 package me.dankofuk;
 
 import com.golfing8.kore.FactionsKore;
+import com.golfing8.kore.feature.PrinterFeature;
 import me.dankofuk.commands.CommandLogViewer;
 import me.dankofuk.commands.StaffUtilsCommand;
 import me.dankofuk.discord.DiscordBot;
@@ -14,6 +15,7 @@ import me.dankofuk.commands.SyncGameCommand;
 import me.dankofuk.discord.syncing.SyncStorage;
 import me.dankofuk.factions.FactionStrike;
 import me.dankofuk.factions.FactionsTopAnnouncer;
+import me.dankofuk.fkore.FKorePrinterLogger;
 import me.dankofuk.loggers.advancedbans.*;
 import me.dankofuk.loggers.creative.CreativeDropLogger;
 import me.dankofuk.loggers.creative.CreativeMiddleClickLogger;
@@ -82,8 +84,10 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
     public AMuteListener aMuteListener;
     // Syncing
     public SyncStorage syncStorage;
-
-
+    // FKore
+    public FKorePrinterLogger printerLogger;
+    public FactionsKore fkore;
+    public PrinterFeature printerFeature;
     public void onEnable() {
         // Loading configuration
         FileConfiguration config = getConfig();
@@ -278,7 +282,15 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             Objects.requireNonNull(getCommand("sync")).setExecutor(new SyncGameCommand(discordBot, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
             getLogger().warning("Discord 2 Game Syncing - [Enabled]");
         }
-
+        boolean fKorePrinterEnabled = config.getBoolean("(FKORE-PRINTER-LOGGER.enabled");
+        if (!config.getBoolean("FKORE-PRINTER-LOGGER.enabled")) {
+            getLogger().info("FKore Printer Logger - [Not Enabled]");
+        } else {
+            FactionsKore fkore = getFKoreInstance();
+            this.printerLogger = new FKorePrinterLogger(printerFeature, fkore);
+            getServer().getPluginManager().registerEvents(this.printerLogger, this);
+            getLogger().info("FKore Printer Logger - [Enabled]");
+        }
         this.staffUtilsCommand = new StaffUtilsCommand();
         Objects.requireNonNull(getCommand("stafflogger")).setExecutor(this.staffUtilsCommand);
         new ThreadPoolExecutor(5, 10, 1L, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
