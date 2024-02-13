@@ -47,7 +47,7 @@ public class SyncGameCommand implements CommandExecutor {
         Player player = (Player) sender;
 
         if (!player.hasPermission("commandlogger.sync.use")) {
-            player.sendMessage(ColorUtils.translateColorCodes(Objects.requireNonNull(KushStaffUtils.getInstance().messagesConfig.getString("        try {\n"))));
+            player.sendMessage(ColorUtils.translateColorCodes(Objects.requireNonNull(KushStaffUtils.getInstance().messagesConfig.getString("noPermissionMessage"))));
             return true;
         }
 
