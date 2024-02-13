@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -35,17 +36,18 @@ public class FKoreLeavePrinterLogger implements Listener {
     public void handlePrinterExit(PlayerPrinterExitEvent event) {
         Player player = event.getPlayer();
         PlayerPrinterExitEvent.ExitReason reason = event.getExitReason();
+        BigDecimal moneySpent = event.getPrinterInfo().getMoneySpent();
         if (printerFeature.isInPrinter(player)) {
             KushStaffUtils.getInstance().getLogger().info(player.getName() + " exited Printer mode with reason: " + reason.toString());
             try {
-                sendWebhookToDiscord(player.getName(), reason.toString());
+                sendWebhookToDiscord(player.getName(), reason.toString(), moneySpent);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void sendWebhookToDiscord(String playerName, String exitReason) {
+    private void sendWebhookToDiscord(String playerName, String exitReason, BigDecimal moneySpent) {
         KushStaffUtils.getInstance().getLogger().info("Sending exit webhook to Discord");
         CompletableFuture.runAsync(() -> {
             try {
@@ -58,7 +60,7 @@ public class FKoreLeavePrinterLogger implements Listener {
                 JsonObject json = new JsonObject();
                 json.addProperty("username", "Printer Logger");
                 JsonObject embed = new JsonObject();
-                embed.addProperty("description", playerName + " has exited printer mode " + exitReason);
+                embed.addProperty("description", playerName + " has exited printer mode reason: " + exitReason + " and has spend " + moneySpent);
                 embed.addProperty("title", "Printer Logger");
                 JsonArray embeds = new JsonArray();
                 embeds.add(embed);
