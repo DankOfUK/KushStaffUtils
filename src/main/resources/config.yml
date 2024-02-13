@@ -411,3 +411,30 @@ advancedbans:
     embedFooter: "%time%"
     embedThumbnail: "https://cdn.discordapp.com/avatars/1093413225338507344/a60fa5f0a630cafb471effcf3a3e1bd8.png?size=4096"
     embedAvatar: "https://cdn.discordapp.com/avatars/1093413225338507344/a60fa5f0a630cafb471effcf3a3e1bd8.png?size=4096"
+
+#----------------------------------------------------------------
+# Vote Panel Configuration - Discord Required
+#----------------------------------------------------------------
+# Placeholders for Vote Panel
+#
+
+VOTE-EMBED:
+  TITLE: "Voting Panel"
+  DESCRIPTION:
+    - "Line 1 of description"
+    - "Line 2 of description"
+  THUMBNAIL-URL: https://i.ytimg.com/vi/mm8UEsfVAUE/maxresdefault.jpg
+  COLOR: '#FFA500'
+VOTE-BUTTONS:
+  butto:
+    MESSAGE: "Vote Link #1"
+    VOTE-LINK: "https://planetminecraft.com/"
+  button:
+    MESSAGE: "Vote Link #2"
+    VOTE-LINK: "https://planetminecraft.com/"
+  but3:
+    MESSAGE: "Vote Link #3"
+    VOTE-LINK: "https://planetminecraft.com/"
+  butn4:
+    MESSAGE: "Vote Link #4"
+    VOTE-LINK: "https://planetminecraft.com/"
