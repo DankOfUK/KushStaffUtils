@@ -22,23 +22,23 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class SendRewardEmbedCommand extends ListenerAdapter {
     private final FileConfiguration config;
     public DiscordBot discordBot;
-    public SyncStorage syncStorage;
+    public final SyncStorage syncStorage;
     public Map<Long, Long> lastClaimedTimes = new HashMap<>();
-    public String Url;
-    public String Username;
-    public String Password;
+    private final Map<String, Boolean> interactionHandled = new HashMap<>();
 
-    public SendRewardEmbedCommand(DiscordBot discordBot, FileConfiguration config, String Url, String Username, String Password) {
+    public SendRewardEmbedCommand(DiscordBot discordBot, FileConfiguration config, SyncStorage syncStorage) {
         this.discordBot = discordBot;
         this.config = KushStaffUtils.getInstance().syncingConfig;
-        this.Url = Url;
-        this.Username = Username;
-        this.Password = Password;
-        this.syncStorage = new SyncStorage(Url, Username, Password);
+        this.syncStorage = new SyncStorage(KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD"));
+    }
+
+    private KushStaffUtils getPlugin() {
+        return KushStaffUtils.getInstance();
     }
 
     @Override
@@ -89,28 +89,65 @@ public class SendRewardEmbedCommand extends ListenerAdapter {
     }
 
     @Override
-    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        String buttonId = event.getComponentId();
-        long discordId = event.getUser().getIdLong();
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent vEvent) {
+        if (vEvent.isAcknowledged()) {
+            Bukkit.getLogger().info("Ignoring already acknowledged interaction.");
+            return;
+        }
+        String buttonId = vEvent.getComponentId();
+        long discordId = vEvent.getUser().getIdLong();
         long currentTime = System.currentTimeMillis();
 
-        String requiredRoleId = config.getString("BUTTONS." + buttonId + ".REQUIRED-ROLE-ID");
-        long interval = config.getLong("BUTTONS." + buttonId + ".REWARD-INTERVAL") * 1000;
+        // Generate a unique interaction ID
+        String interactionId = vEvent.getId() + buttonId;
 
-        if (canClaimReward(discordId, currentTime, interval) && hasRequiredRole(discordId, requiredRoleId)) {
-            UUID minecraftUuid = syncStorage.getMinecraftUuid(discordId);
-            if (minecraftUuid != null) {
-                giveReward(minecraftUuid, buttonId);
-                lastClaimedTimes.put(discordId, currentTime);
-                event.reply("You have claimed your reward!").setEphemeral(true).queue();
-            } else {
-                event.reply("You need to sync with Minecraft to claim the reward.").setEphemeral(true).queue();
-            }
-        } else {
-            long lastClaimedTime = lastClaimedTimes.getOrDefault(discordId, 0L);
-            long timeUntilNextClaim = (lastClaimedTime + config.getLong("REWARD-INTERVAL") * 1000) - currentTime;
-            event.reply("You can claim your next reward in " + timeUntilNextClaim / 1000 + " seconds.").setEphemeral(true).queue();
+        // Check if the interaction has already been handled
+        if (interactionHandled.getOrDefault(interactionId, false)) {
+            Bukkit.getLogger().info("Ignoring duplicate interaction: " + interactionId);
+            return;
         }
+
+        // Set the flag to true to mark that the interaction is being handled
+        interactionHandled.put(interactionId, true);
+
+        // Use Bukkit's scheduler to handle the asynchronous code
+        Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), () -> {
+            Bukkit.getLogger().info("Handling button interaction asynchronously...");
+
+            // Additional logic for SendRewardEmbedCommand buttons
+            if (buttonId.startsWith("send_reward_")) {
+                String rewardType = buttonId.substring("send_reward_".length());
+                vEvent.reply("You clicked the button for reward type: " + rewardType).setEphemeral(true).queue();
+                // Add any specific behavior for each reward type here
+            } else {
+                String requiredRoleId = config.getString("BUTTONS." + buttonId + ".REQUIRED-ROLE-ID");
+                long interval = config.getLong("BUTTONS." + buttonId + ".REWARD-INTERVAL") * 1000;
+
+                if (canClaimReward(discordId, currentTime, interval) && hasRequiredRole(discordId, requiredRoleId)) {
+                    UUID minecraftUuid = syncStorage.getMinecraftUuid(discordId);
+                    if (minecraftUuid != null) {
+                        giveReward(minecraftUuid, buttonId);
+                        lastClaimedTimes.put(discordId, currentTime);
+                        vEvent.reply("You have claimed your reward!").setEphemeral(true).queue();
+                    } else {
+                        vEvent.reply("You need to sync with Minecraft to claim the reward.").setEphemeral(true).queue();
+                    }
+                } else {
+                    long lastClaimedTime = lastClaimedTimes.getOrDefault(discordId, 0L);
+                    long timeUntilNextClaim = (lastClaimedTime + config.getLong("REWARD-INTERVAL") * 1000) - currentTime;
+                    vEvent.reply("You can claim your next reward in " + timeUntilNextClaim / 1000 + " seconds.")
+                            .setEphemeral(true).queue();
+                    Bukkit.getLogger().info("Interaction handling complete.");
+                }
+            }
+
+            // Reset the flag after a delay to allow for the next interaction
+            Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
+                interactionHandled.put(interactionId, false);
+                Bukkit.getLogger().info("Interaction handling complete.");
+            }, 20L);  // Delayed reset to ensure there's no interference with the next interaction
+        });
+        vEvent.deferEdit().queue();
     }
 
     private boolean canClaimReward(long discordId, long currentTime, long interval) {
