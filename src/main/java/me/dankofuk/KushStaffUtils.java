@@ -158,9 +158,9 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         // Start/Stop Logger (Discord Bot Feature)
         if (!config.getBoolean("bot.enabled")) {
             getLogger().warning("Start/Stop Logger - [Not Enabled] - (Requires Discord Bot enabled)");
-            } else if (!config.getBoolean("serverstatus.enabled")) {
-                getLogger().warning("Start/Stop Logger - [Not Enabled] - (Requires Discord Bot enabled)");
-            } else {
+        } else if (!config.getBoolean("serverstatus.enabled")) {
+            getLogger().warning("Start/Stop Logger - [Not Enabled] - (Requires Discord Bot enabled)");
+        } else {
             this.startStopLogger = new StartStopLogger(discordBot);
             startStopLogger.sendStatusUpdateMessage(true);
             getLogger().warning("Start/Stop Logger - [Enabled]");
@@ -202,7 +202,7 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(this.bugCommand, this);
             Objects.requireNonNull(getCommand("bug")).setExecutor(this.bugCommand);
             getLogger().warning("Bug Command - [Enabled]");
-            }
+        }
         // Join Leave Logger (Webhooks)
         if (!config.getBoolean("player_leave_join_logger.enabled")) {
             getLogger().warning("Player Join Leave Logger - [Not Enabled]");
@@ -243,7 +243,10 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         }
 
         // LiteBans Logging (Webhooks)
-        if (!config.getBoolean("litebans.enabled")) {
+        Plugin liteBans = pluginManager.getPlugin("LiteBans");
+        if (liteBans == null) {
+            getLogger().warning("LiteBans is not installed or enabled. This feature will not work!");
+        } else if (!config.getBoolean("litebans.enabled")) {
             getLogger().warning("LiteBans Logging - [Not Enabled]");
         } else {
             this.lbKickListener = new LBKickListener(this);
@@ -258,7 +261,10 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         }
 
         // AdvacnedBans Logging (Webhooks)
-        if (!config.getBoolean("advancedbans.enabled")) {
+        Plugin advancedBans = pluginManager.getPlugin("AdvacnedBans");
+        if (advancedBans == null) {
+            getLogger().warning("AdvacnedBans is not installed or enabled. This feature will not work!");
+        } else if (!config.getBoolean("advancedbans.enabled")) {
             getLogger().warning("AdvancedBans Logging - [Not Enabled]");
         } else {
             this.aMuteListener = new AMuteListener(this);
@@ -284,7 +290,10 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             Objects.requireNonNull(getCommand("sync")).setExecutor(new SyncGameCommand(discordBot, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
             getLogger().warning("Discord 2 Game Syncing - [Enabled]");
         }
-        if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+        Plugin factionsKore = pluginManager.getPlugin("FactionsKore");
+        if (factionsKore == null) {
+            getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+        } else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
             getLogger().info("FKore Leave Printer Logger - [Not Enabled]");
         } else {
             PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
@@ -292,7 +301,9 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(printerLeaveLogger, this);
             getLogger().info("FKore Leave Printer Logger - [Enabled]");
         }
-        if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+        if (factionsKore == null) {
+            getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+        } else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
             getLogger().info("FKore Enter Printer Logger - [Not Enabled]");
         } else {
             PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
