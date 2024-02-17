@@ -71,7 +71,7 @@ public class FKoreLeavePrinterLogger implements Listener {
                 JsonObject embed = new JsonObject();
                 embed.addProperty("description", playerName + " has exited printer mode!\n Reason: "
                         + exitReason + "\n Money Spent: " + moneySpent + "\n Blocks placed: "
-                        + blocksPlaced.toString() + "\n Location: " + "X:" + xLocation + " Y:" + yLocation
+                        + blocksPlaced + "\n Location: " + "X:" + xLocation + " Y:" + yLocation
                         + " Z:" + zLocation + " World: " + worldName);
                 embed.addProperty("title", "Printer Logger");
                 JsonArray embeds = new JsonArray();

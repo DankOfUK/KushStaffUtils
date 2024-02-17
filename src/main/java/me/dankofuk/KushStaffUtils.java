@@ -2,6 +2,7 @@ package me.dankofuk;
 
 import com.golfing8.kore.FactionsKore;
 import com.golfing8.kore.feature.PrinterFeature;
+import com.golfing8.kore.topexpansion.feature.FactionsTopFeature;
 import me.dankofuk.commands.CommandLogViewer;
 import me.dankofuk.commands.StaffUtilsCommand;
 import me.dankofuk.discord.DiscordBot;
@@ -14,9 +15,9 @@ import me.dankofuk.discord.listeners.StartStopLogger;
 import me.dankofuk.commands.SyncGameCommand;
 import me.dankofuk.discord.syncing.SyncStorage;
 import me.dankofuk.factions.FactionStrike;
-import me.dankofuk.factions.FactionTopPlaceAnnouncer;
 import me.dankofuk.factions.FactionsTopAnnouncer;
 import me.dankofuk.fkore.FKoreEnterPrinterLogger;
+import me.dankofuk.fkore.FKoreFactionOvertakeLogger;
 import me.dankofuk.fkore.FKoreLeavePrinterLogger;
 import me.dankofuk.loggers.advancedbans.*;
 import me.dankofuk.loggers.creative.CreativeDropLogger;
@@ -67,7 +68,6 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
     public DiscordBot discordBot;
     public FactionStrike factionStrike;
     public FactionsTopAnnouncer factionsTopAnnouncer;
-    public FactionTopPlaceAnnouncer factionTopPlaceAnnouncer;
     public ChatWebhook chatWebhook;
     public CreativeMiddleClickLogger creativeLogger;
     public CreativeDropLogger creativeDropLogger;
@@ -90,8 +90,10 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
     // FKore
     public FKoreLeavePrinterLogger printerLeaveLogger;
     public FKoreEnterPrinterLogger printerEnterLogger;
+    public FKoreFactionOvertakeLogger overtakeLogger;
     public FactionsKore fkore;
     public PrinterFeature printerFeature;
+    public FactionsTopFeature factionsTopFeature;
     public void onEnable() {
         // Loading configuration
         FileConfiguration config = getConfig();
@@ -174,14 +176,6 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             this.factionsTopAnnouncer = new FactionsTopAnnouncer(config, this);
             Bukkit.getPluginManager().registerEvents(factionsTopAnnouncer, this);
             getLogger().warning("Factions Top Announcer - [Enabled]");
-        }
-        // Factions/Skyblock Top Place Announcer (Webhook)
-        if (!config.getBoolean("place-announcer.enabled")) {
-            getLogger().warning("Factions Top Place Announcer - [Not Enabled]");
-        } else {
-            this.factionTopPlaceAnnouncer = new FactionTopPlaceAnnouncer(config, this);
-            Bukkit.getPluginManager().registerEvents(factionTopPlaceAnnouncer, this);
-            getLogger().warning("Factions Top Place Announcer - [Enabled]");
         }
         // Player Report Command (Webhook + Command)
         if (!config.getBoolean("bot.enabled")) {
@@ -321,6 +315,16 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(printerEnterLogger, this);
             getLogger().info("FKore Enter Printer Logger - [Enabled]");
         }
+        if (factionsKore == null) {
+            getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+        } else if (!config.getBoolean("FKORE-OVERTAKE-LOGGER.enabled")) {
+            getLogger().info("FKore FTop Overtake Logger - [Not Enabled]");
+        } else {
+            FactionsTopFeature factionsTopFeature = FactionsKore.get().getFeature(FactionsTopFeature.class);
+            overtakeLogger = new FKoreFactionOvertakeLogger(factionsTopFeature, this);
+            getServer().getPluginManager().registerEvents(overtakeLogger, this);
+            getLogger().info("FKore FTop Overtake Logger - [Enabled]");
+        }
         this.staffUtilsCommand = new StaffUtilsCommand();
         Objects.requireNonNull(getCommand("stafflogger")).setExecutor(this.staffUtilsCommand);
         new ThreadPoolExecutor(5, 10, 1L, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
@@ -344,10 +348,6 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         boolean factionsTopAnnouncer = config.getBoolean("announcer.enabled");
         if (factionsTopAnnouncer) {
             this.factionsTopAnnouncer.cancelAnnouncements();
-        }
-        boolean factionsTopPlaceAnnouncer = config.getBoolean("place-announcer.enabled");
-        if (factionsTopPlaceAnnouncer) {
-            this.factionTopPlaceAnnouncer.cancelAnnouncements();
         }
         if (discordBotEnabled) {
             if (config.getBoolean("serverstatus.enabled")) {
@@ -404,14 +404,6 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             this.factionsTopAnnouncer = new FactionsTopAnnouncer(config, this);
             Bukkit.getPluginManager().registerEvents(factionsTopAnnouncer, this);
             getLogger().warning("Factions Top Announcer - [Enabled]");
-        }
-        // Factions/Skyblock Top Place Announcer (Webhook)
-        if (!config.getBoolean("place-announcer.enabled")) {
-            getLogger().warning("Factions Top Place Announcer - [Not Enabled]");
-        } else {
-            this.factionTopPlaceAnnouncer = new FactionTopPlaceAnnouncer(config, this);
-            Bukkit.getPluginManager().registerEvents(factionTopPlaceAnnouncer, this);
-            getLogger().warning("Factions Top Place Announcer - [Enabled]");
         }
         // Player Report Command (Webhook + Command)
         if (!config.getBoolean("bot.enabled")) {
@@ -540,6 +532,16 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             printerLeaveLogger = new FKoreLeavePrinterLogger(printerKore, this);
             getServer().getPluginManager().registerEvents(printerLeaveLogger, this);
             getLogger().info("FKore Leave Printer Logger - [Enabled]");
+        }
+        if (factionsKore == null) {
+            getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+        } else if (!config.getBoolean("FKORE-OVERTAKE-LOGGER.enabled")) {
+            getLogger().info("FKore FTop Overtake Logger - [Not Enabled]");
+        } else {
+            FactionsTopFeature factionsTopFeature = FactionsKore.get().getFeature(FactionsTopFeature.class);
+            overtakeLogger = new FKoreFactionOvertakeLogger(factionsTopFeature, this);
+            getServer().getPluginManager().registerEvents(overtakeLogger, this);
+            getLogger().info("FKore FTop Overtake Logger - [Enabled]");
         }
         if (factionsKore == null) {
             getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
