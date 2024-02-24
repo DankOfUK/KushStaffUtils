@@ -28,7 +28,6 @@ public class FKoreFactionOvertakeLogger implements Listener {
     public FKoreFactionOvertakeLogger(FactionsTopFeature ftop, KushStaffUtils instance) {
         this.ftop = ftop;
         this.instance = instance;
-
     }
 
     @EventHandler
@@ -46,7 +45,7 @@ public class FKoreFactionOvertakeLogger implements Listener {
         }
 
     }
-    private void sendWebhookToDiscord(String knockedId, String overtakeId, String eventName, int knockPosition) {
+    private void sendWebhookToDiscord(String eventName, String knockedId, String overtakeId, int knockPosition) {
         CompletableFuture.runAsync(() -> {
             try {
                 URL url = new URL(Objects.requireNonNull(KushStaffUtils.getInstance().getConfig().getString("FKORE-OVERTAKE-LOGGER.webhookUrl")));
@@ -58,10 +57,19 @@ public class FKoreFactionOvertakeLogger implements Listener {
 
                 JsonObject json = new JsonObject();
                 json.addProperty("username", "FKoreFtopOvertakeLogger");
+
                 JsonArray embeds = new JsonArray();
                 JsonObject embed = new JsonObject();
-                embed.addProperty("description", "Faction " + FactionsKore.getIntegration().getTagFromId(knockedId) + " was overtaken by " + FactionsKore.getIntegration().getTagFromId(overtakeId) + " at position " + knockPosition);
-                embed.addProperty("title", "FKoreFtopOvertakeLogger");
+
+                String description = KushStaffUtils.getInstance().getConfig().getString("FKORE-OVERTAKE-LOGGER.description");
+                description = Objects.requireNonNull(description).replace("%knocked_faction%", FactionsKore.getIntegration().getTagFromId(knockedId));
+                description = description.replace("%overtake_faction%", FactionsKore.getIntegration().getTagFromId(overtakeId));
+                description = description.replace("%knocked_position%", String.valueOf(knockPosition));
+
+                embed.addProperty("description", description);
+                embed.addProperty("title", KushStaffUtils.getInstance().getConfig().getString("FKORE-OVERTAKE-LOGGER.title"));
+                embed.addProperty("color", KushStaffUtils.getInstance().getConfig().getInt("FKORE-OVERTAKE-LOGGER.embedColor"));
+
                 embeds.add(embed);
 
                 json.add("embeds", embeds);
