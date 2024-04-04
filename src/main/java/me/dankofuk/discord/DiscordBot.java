@@ -77,7 +77,7 @@ public class DiscordBot extends ListenerAdapter {
         this.jda.addEventListener(new HelpCommand(this));
         this.sendSyncPanel = new SendSyncPanel(this, syncStorage);
         this.jda.addEventListener(sendSyncPanel);
-        this.jda.addEventListener(new VoteCommand(this));
+        //this.jda.addEventListener(new VoteCommand(this));
         this.jda.addEventListener(new SendRewardEmbedCommand(this, config, syncStorage));
         this.jda.addEventListener(new UnSyncCommand(this, syncStorage));
         this.jda.addEventListener(new OnlinePlayersCommand(this));
