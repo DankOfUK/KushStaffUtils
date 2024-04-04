@@ -125,12 +125,14 @@ public class SendRewardEmbedCommand extends ListenerAdapter {
 
                 if (canClaimReward(discordId, currentTime, interval) && hasRequiredRole(discordId, requiredRoleId)) {
                     UUID minecraftUuid = syncStorage.getMinecraftUuid(discordId);
+                    // TODO fix this. (error 1.20, async command)
+
                     if (minecraftUuid != null) {
                         giveReward(minecraftUuid, buttonId);
                         lastClaimedTimes.put(discordId, currentTime);
                         vEvent.reply("You have claimed your reward!").setEphemeral(true).queue();
                     } else {
-                        vEvent.reply("You need to sync with Minecraft to claim the reward.").setEphemeral(true).queue();
+                        vEvent.getChannel().sendMessage("You need to sync with Minecraft to claim the reward.").queue();
                     }
                 } else {
                     long lastClaimedTime = lastClaimedTimes.getOrDefault(discordId, 0L);
