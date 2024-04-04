@@ -9,8 +9,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import me.dankofuk.KushStaffUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,7 +31,6 @@ public class FKoreLeavePrinterLogger implements Listener {
     public FKoreLeavePrinterLogger(PrinterFeature printerFeature, KushStaffUtils instance) {
         this.printerFeature = printerFeature;
         this.instance = instance;
-
     }
 
     @EventHandler
@@ -44,7 +41,7 @@ public class FKoreLeavePrinterLogger implements Listener {
         int xLocation = event.getPlayer().getLocation().getBlockX();
         int yLocation = event.getPlayer().getLocation().getBlockY();
         int zLocation = event.getPlayer().getLocation().getBlockZ();
-        String worldName  = Objects.requireNonNull(event.getPlayer().getLocation().getWorld()).getName();
+        String worldName = Objects.requireNonNull(event.getPlayer().getLocation().getWorld()).getName();
         Map<MaterialInfo, PlayerPrinterInfo.BlockRecord> blocksPlaced = event.getPrinterInfo().getPrintedBlocks();
         if (printerFeature.isInPrinter(player)) {
             KushStaffUtils.getInstance().getLogger().info(player.getName() + " exited Printer mode with reason: " + reason.toString());
@@ -61,26 +58,39 @@ public class FKoreLeavePrinterLogger implements Listener {
         CompletableFuture.runAsync(() -> {
             try {
                 URL url = new URL(Objects.requireNonNull(KushStaffUtils.getInstance().getConfig().getString("PRINTER-LOGGER.webhookUrl")));
-                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("User-Agent", "PrinterLogger");
                 connection.setDoOutput(true);
+
                 JsonObject json = new JsonObject();
                 json.addProperty("username", "Printer Logger");
-                JsonObject embed = new JsonObject();
-                embed.addProperty("description", playerName + " has exited printer mode!\n Reason: "
-                        + exitReason + "\n Money Spent: " + moneySpent + "\n Blocks placed: "
-                        + blocksPlaced + "\n Location: " + "X:" + xLocation + " Y:" + yLocation
-                        + " Z:" + zLocation + " World: " + worldName);
-                embed.addProperty("title", "Printer Logger");
+
                 JsonArray embeds = new JsonArray();
+                JsonObject embed = new JsonObject();
+
+                embed.addProperty("description", KushStaffUtils.getInstance().getConfig().getString("PRINTER-LOGGER.exitMessageFormat")
+                        .replace("%player%", playerName)
+                        .replace("%reason%", exitReason)
+                        .replace("%moneySpent%", moneySpent.toString())
+                        .replace("%blocksPlaced%", blocksPlaced.toString())
+                        .replace("%xLocation%", String.valueOf(xLocation))
+                        .replace("%yLocation%", String.valueOf(yLocation))
+                        .replace("%zLocation%", String.valueOf(zLocation))
+                        .replace("%worldName%", worldName));
+                embed.addProperty("title", KushStaffUtils.getInstance().getConfig().getString("PRINTER-LOGGER.titleFormat"));
+                embed.addProperty("color", KushStaffUtils.getInstance().getConfig().getInt("PRINTER-LOGGER.embedColor"));
+
                 embeds.add(embed);
+
                 json.add("embeds", embeds);
+
                 String message = (new Gson()).toJson(json);
                 try (OutputStream os = connection.getOutputStream()) {
                     os.write(message.getBytes());
                 }
+
                 connection.connect();
                 int responseCode = connection.getResponseCode();
                 String str1 = connection.getResponseMessage();
