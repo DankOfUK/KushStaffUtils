@@ -294,37 +294,37 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             Objects.requireNonNull(getCommand("sync")).setExecutor(new SyncGameCommand(discordBot, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
             getLogger().warning("Discord 2 Game Syncing - [Enabled]");
         }
-        Plugin factionsKore = pluginManager.getPlugin("FactionsKore");
-        if (factionsKore == null) {
-            getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
-        } else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
-            getLogger().info("FKore Leave Printer Logger - [Not Enabled]");
-        } else {
-            PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
-            printerLeaveLogger = new FKoreLeavePrinterLogger(printerKore, this);
-            getServer().getPluginManager().registerEvents(printerLeaveLogger, this);
-            getLogger().info("FKore Leave Printer Logger - [Enabled]");
-        }
-        if (factionsKore == null) {
-            getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
-        } else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
-            getLogger().info("FKore Enter Printer Logger - [Not Enabled]");
-        } else {
-            PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
-            printerEnterLogger = new FKoreEnterPrinterLogger(printerKore, this);
-            getServer().getPluginManager().registerEvents(printerEnterLogger, this);
-            getLogger().info("FKore Enter Printer Logger - [Enabled]");
-        }
-        if (factionsKore == null) {
-            getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
-        } else if (!config.getBoolean("FKORE-OVERTAKE-LOGGER.enabled")) {
-            getLogger().info("FKore FTop Overtake Logger - [Not Enabled]");
-        } else {
-            FactionsTopFeature factionsTopFeature = FactionsKore.get().getFeature(FactionsTopFeature.class);
-            overtakeLogger = new FKoreFactionOvertakeLogger(factionsTopFeature, this);
-            getServer().getPluginManager().registerEvents(overtakeLogger, this);
-            getLogger().info("FKore FTop Overtake Logger - [Enabled]");
-        }
+        //Plugin factionsKore = pluginManager.getPlugin("FactionsKore");
+        //if (factionsKore == null) {
+        //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+        //} else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+        //    getLogger().info("FKore Leave Printer Logger - [Not Enabled]");
+        //} else {
+        //    PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
+        //    printerLeaveLogger = new FKoreLeavePrinterLogger(printerKore, this);
+        //    getServer().getPluginManager().registerEvents(printerLeaveLogger, this);
+        //    getLogger().info("FKore Leave Printer Logger - [Enabled]");
+        //}
+        //if (factionsKore == null) {
+        //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+        //} else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+        //    getLogger().info("FKore Enter Printer Logger - [Not Enabled]");
+        //} else {
+        //    PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
+        //    printerEnterLogger = new FKoreEnterPrinterLogger(printerKore, this);
+        //    getServer().getPluginManager().registerEvents(printerEnterLogger, this);
+        //    getLogger().info("FKore Enter Printer Logger - [Enabled]");
+        //}
+        //if (factionsKore == null) {
+        //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+        //} else if (!config.getBoolean("FKORE-OVERTAKE-LOGGER.enabled")) {
+        //    getLogger().info("FKore FTop Overtake Logger - [Not Enabled]");
+        //} else {
+        //    FactionsTopFeature factionsTopFeature = FactionsKore.get().getFeature(FactionsTopFeature.class);
+        //    overtakeLogger = new FKoreFactionOvertakeLogger(factionsTopFeature, this);
+        //    getServer().getPluginManager().registerEvents(overtakeLogger, this);
+        //    getLogger().info("FKore FTop Overtake Logger - [Enabled]");
+        //}
         this.staffUtilsCommand = new StaffUtilsCommand();
         Objects.requireNonNull(getCommand("stafflogger")).setExecutor(this.staffUtilsCommand);
         new ThreadPoolExecutor(5, 10, 1L, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
@@ -349,12 +349,10 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         if (factionsTopAnnouncer) {
             this.factionsTopAnnouncer.cancelAnnouncements();
         }
-        if (discordBotEnabled) {
-            if (config.getBoolean("serverstatus.enabled")) {
+        boolean stopLogger = config.getBoolean("serverstatus.enabled");
+        if (stopLogger) {
                 startStopLogger.sendStatusUpdateMessage(false);
             }
-        } else
-            getLogger().info("[Failed to start the start/stop logger]");
         Bukkit.getConsoleSender().sendMessage("[KushStaffUtils] Plugin has been disabled!");
     }
 
@@ -514,7 +512,7 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             getLogger().warning("AdvancedBans Logging - [Enabled]");
         }
 
-        if (!syncingConfig.getBoolean("enabled")) {
+        if (!syncingConfig.getBoolean("ena//////////////bled")) {
             getLogger().warning("Discord 2 Game Syncing - [Not Enabled]");
         } else {
             syncStorage = new SyncStorage(syncingConfig.getString("MYSQL.URL"), syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD"));
@@ -522,37 +520,37 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             Objects.requireNonNull(getCommand("sync")).setExecutor(new SyncGameCommand(discordBot, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
             getLogger().warning("Discord 2 Game Syncing - [Enabled]");
         }
-        Plugin factionsKore = Bukkit.getPluginManager().getPlugin("FactionsKore");
-        if (factionsKore == null) {
-            getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
-        } else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
-            getLogger().info("FKore Leave Printer Logger - [Not Enabled]");
-        } else {
-            PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
-            printerLeaveLogger = new FKoreLeavePrinterLogger(printerKore, this);
-            getServer().getPluginManager().registerEvents(printerLeaveLogger, this);
-            getLogger().info("FKore Leave Printer Logger - [Enabled]");
-        }
-        if (factionsKore == null) {
-            getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
-        } else if (!config.getBoolean("FKORE-OVERTAKE-LOGGER.enabled")) {
-            getLogger().info("FKore FTop Overtake Logger - [Not Enabled]");
-        } else {
-            FactionsTopFeature factionsTopFeature = FactionsKore.get().getFeature(FactionsTopFeature.class);
-            overtakeLogger = new FKoreFactionOvertakeLogger(factionsTopFeature, this);
-            getServer().getPluginManager().registerEvents(overtakeLogger, this);
-            getLogger().info("FKore FTop Overtake Logger - [Enabled]");
-        }
-        if (factionsKore == null) {
-            getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
-        } else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
-            getLogger().info("FKore Enter Printer Logger - [Not Enabled]");
-        } else {
-            PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
-            printerEnterLogger = new FKoreEnterPrinterLogger(printerKore, this);
-            getServer().getPluginManager().registerEvents(printerEnterLogger, this);
-            getLogger().info("FKore Enter Printer Logger - [Enabled]");
-        }
+       //Plugin factionsKore = Bukkit.getPluginManager().getPlugin("FactionsKore");
+       //if (factionsKore == null) {
+       //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+       //} else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+       //    getLogger().info("FKore Leave Printer Logger - [Not Enabled]");
+       //} else {
+       //    PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
+       //    printerLeaveLogger = new FKoreLeavePrinterLogger(printerKore, this);
+       //    getServer().getPluginManager().registerEvents(printerLeaveLogger, this);
+       //    getLogger().info("FKore Leave Printer Logger - [Enabled]");
+       //}
+       //if (factionsKore == null) {
+       //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+       //} else if (!config.getBoolean("FKORE-OVERTAKE-LOGGER.enabled")) {
+       //    getLogger().info("FKore FTop Overtake Logger - [Not Enabled]");
+       //} else {
+       //    FactionsTopFeature factionsTopFeature = FactionsKore.get().getFeature(FactionsTopFeature.class);
+       //    overtakeLogger = new FKoreFactionOvertakeLogger(factionsTopFeature, this);
+       //    getServer().getPluginManager().registerEvents(overtakeLogger, this);
+       //    getLogger().info("FKore FTop Overtake Logger - [Enabled]");
+       //}
+       //if (factionsKore == null) {
+       //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+       //} else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+       //    getLogger().info("FKore Enter Printer Logger - [Not Enabled]");
+       //} else {
+       //    PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
+       //    printerEnterLogger = new FKoreEnterPrinterLogger(printerKore, this);
+       //    getServer().getPluginManager().registerEvents(printerEnterLogger, this);
+       //    getLogger().info("FKore Enter Printer Logger - [Enabled]");
+       //}
         Bukkit.getConsoleSender().sendMessage("[KushStaffUtils] Config options have been reloaded!");
     }
 
