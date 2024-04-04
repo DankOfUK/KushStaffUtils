@@ -46,23 +46,34 @@ public class FKoreEnterPrinterLogger implements Listener {
         CompletableFuture.runAsync(() -> {
             try {
                 URL url = new URL(Objects.requireNonNull(KushStaffUtils.getInstance().getConfig().getString("PRINTER-LOGGER.webhookUrl")));
-                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("User-Agent", "PrinterLogger");
                 connection.setDoOutput(true);
+
                 JsonObject json = new JsonObject();
                 json.addProperty("username", "Printer Logger");
-                JsonObject embed = new JsonObject();
-                embed.addProperty("description", playerName + " has entered printer mode ");
-                embed.addProperty("title", "Printer Logger");
+
+                // Customize content based on the configuration
                 JsonArray embeds = new JsonArray();
+                JsonObject embed = new JsonObject();
+
+                // Configurable embed properties
+                embed.addProperty("description", KushStaffUtils.getInstance().getConfig().getString("PRINTER-LOGGER.description")
+                        .replace("%player%", playerName));
+                embed.addProperty("title", KushStaffUtils.getInstance().getConfig().getString("PRINTER-LOGGER.title"));
+                embed.addProperty("color", KushStaffUtils.getInstance().getConfig().getInt("PRINTER-LOGGER.color"));
+
                 embeds.add(embed);
+
                 json.add("embeds", embeds);
+
                 String message = (new Gson()).toJson(json);
                 try (OutputStream os = connection.getOutputStream()) {
                     os.write(message.getBytes());
                 }
+
                 connection.connect();
                 int responseCode = connection.getResponseCode();
                 String str1 = connection.getResponseMessage();
