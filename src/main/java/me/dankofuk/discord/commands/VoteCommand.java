@@ -37,6 +37,9 @@ public class VoteCommand extends ListenerAdapter {
         boolean hasPermission = Objects.requireNonNull(vEvent.getMember()).getRoles().stream()
                 .anyMatch(role -> role.getId().equals(discordBot.getAdminRoleID()));
 
+        boolean voteEnabled = KushStaffUtils.getInstance().getConfig().getBoolean("VOTE-ENABLED");
+
+
         if (!hasPermission) {
             EmbedBuilder noPerms = new EmbedBuilder();
             noPerms.setColor(Color.RED);
