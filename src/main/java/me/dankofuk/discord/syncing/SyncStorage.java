@@ -30,7 +30,7 @@ public class SyncStorage {
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logError("Failed to initialize the database.", e);
         }
     }
 
@@ -48,7 +48,7 @@ public class SyncStorage {
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logError("Failed to save sync data for Discord ID: " + discordUserId, e);
         }
     }
 
@@ -69,7 +69,7 @@ public class SyncStorage {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logError("Failed to check sync status for Discord ID: " + discordId, e);
         }
         return false;
     }
@@ -91,7 +91,7 @@ public class SyncStorage {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logError("Failed to retrieve Minecraft UUID for Discord ID: " + discordId, e);
         }
         return null;
     }
@@ -111,14 +111,13 @@ public class SyncStorage {
                 Bukkit.getLogger().info("User with Discord ID " + discordId + " removed successfully.");
             }
         } catch (SQLException e) {
-            Bukkit.getLogger().info("Error removing user with Discord ID " + discordId);
-            e.printStackTrace();
+            logError("Error removing user with Discord ID " + discordId, e);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logError("Failed to close statement when removing user with Discord ID: " + discordId, e);
                 }
             }
         }
@@ -131,9 +130,11 @@ public class SyncStorage {
                 Bukkit.getLogger().info("Database connection closed successfully.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logError("Failed to close the database connection.", e);
         }
     }
 
-
+    private void logError(String message, SQLException e) {
+        Bukkit.getLogger().severe(message + " Error: " + e.getMessage());
+    }
 }
