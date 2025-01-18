@@ -79,13 +79,13 @@ public class FKoreEnterPrinterLogger implements Listener {
                 String str1 = connection.getResponseMessage();
             } catch (MalformedURLException e) {
                 Bukkit.getLogger().warning("[PrinterLogger] Invalid webhook URL specified: " + KushStaffUtils.getInstance().getConfig().getString("PRINTER-LOGGER.webhookUrl"));
-                e.printStackTrace();
+                //e.printStackTrace();
             } catch (ProtocolException e) {
                 Bukkit.getLogger().warning("[PrinterLogger] Invalid protocol specified in webhook URL: " + KushStaffUtils.getInstance().getConfig().getString("PRINTER-LOGGER.webhookUrl"));
-                e.printStackTrace();
+                //e.printStackTrace();
             } catch (IOException e) {
                 Bukkit.getLogger().warning("[PrinterLogger] Error sending message to Discord webhook.");
-                e.printStackTrace();
+               // e.printStackTrace();
             }
         });
     }
