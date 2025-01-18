@@ -285,6 +285,45 @@ announcer:
   avatarUrl: "https://cdn.discordapp.com/avatars/1093413225338507344/a60fa5f0a630cafb471effcf3a3e1bd8.png?size=4096"
 
 #----------------------------------------------------------------
+# Freeze Command Config - Discord Bot Not Required
+#----------------------------------------------------------------
+# Placeholders FreezeCommand
+# PlaceholderAPI placeholders work also! (must have the plugin installed)
+# This has no default placeholders, use PlaceholderAPI for placeholders.
+freeze:
+  # Messages shown to the player when frozen
+  freezeMessages:
+    - "&cYou have been frozen!"
+    - "&7Do not attempt to log out or you will be banned."
+    - "&7Please contact staff on our Discord: &bhttps://discord.gg/yourdiscord"
+
+  # General messages
+  noPermissionMessage: "&cYou do not have permission to use this command."
+  playerNotFoundMessage: "&cPlayer not found!"
+  cannotFreezeOpPlayerMessage: "&cYou cannot freeze an OP player."
+  cannotFreezeSelfMessage: "&cYou cannot freeze yourself."
+  freezeSuccessMessage: "&aSuccessfully froze &e%player%&a!"
+  unfreezeSuccessMessage: "&aSuccessfully unfroze &e%player%&a!"
+
+  # Frozen GUI configuration
+  frozenGUITitle: "&cYou Are Frozen!"
+  frozenGUIBarrierName: "&cFrozen Barrier"
+  frozenGUILore: "&7Please contact staff on Discord for help."
+
+  # Restricted actions messages
+  cannotUseEnderpearlsOrChorusFruit: "&cYou cannot use Enderpearls or Chorus Fruit while frozen!"
+  cannotChat: "&cYou cannot chat while frozen!"
+  cannotUseCommands: "&cYou cannot use commands while frozen!"
+  cannotPlaceBlocks: "&cYou cannot place blocks while frozen!"
+  cannotBreakBlocks: "&cYou cannot break blocks while frozen!"
+
+  # Discord server message for the frozen GUI
+  discordServerMessage: "&7Please contact staff on our Discord: &bhttps://discord.gg/yourdiscord"
+
+  # Command to execute if a frozen player logs out
+  logOutCommand: "ban %player% Logging out while frozen!"
+
+#----------------------------------------------------------------
 # Creative Logging Configuration - Discord Bot Not Required
 #----------------------------------------------------------------
 # Placeholders for Factions Top Announcer
@@ -413,28 +452,12 @@ advancedbans:
     embedAvatar: "https://cdn.discordapp.com/avatars/1093413225338507344/a60fa5f0a630cafb471effcf3a3e1bd8.png?size=4096"
 
 #----------------------------------------------------------------
-# Vote Panel Configuration - Discord Required
+# Ticket System Configuration - Discord Required
 #----------------------------------------------------------------
-# Placeholders for Vote Panel
+# Placeholders for Ticket Systen
 #
 
-VOTE-EMBED:
-  TITLE: "Voting Panel"
-  DESCRIPTION:
-    - "Line 1 of description"
-    - "Line 2 of description"
-  THUMBNAIL-URL: https://i.ytimg.com/vi/mm8UEsfVAUE/maxresdefault.jpg
-  COLOR: '#FFA500'
-VOTE-BUTTONS:
-  butto:
-    MESSAGE: "Vote Link #1"
-    VOTE-LINK: "https://planetminecraft.com/"
-  button:
-    MESSAGE: "Vote Link #2"
-    VOTE-LINK: "https://planetminecraft.com/"
-  but3:
-    MESSAGE: "Vote Link #3"
-    VOTE-LINK: "https://planetminecraft.com/"
-  butn4:
-    MESSAGE: "Vote Link #4"
-    VOTE-LINK: "https://planetminecraft.com/"
+TICKET_CHANNELS:
+  SUPPORT: "channel_id_for_support"
+  REPORT: "channel_id_for_report"
+  FEEDBACK: "channel_id_for_feedback"
