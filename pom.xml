@@ -145,6 +145,12 @@
             <version>8.0.33</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>1.9.10</version> <!-- Use the version compatible with your setup -->
+        </dependency>
+
     </dependencies>
 
     <profiles>
