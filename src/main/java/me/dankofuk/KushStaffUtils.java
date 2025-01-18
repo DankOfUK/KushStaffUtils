@@ -4,6 +4,7 @@ import com.golfing8.kore.FactionsKore;
 import com.golfing8.kore.feature.PrinterFeature;
 import com.golfing8.kore.topexpansion.feature.FactionsTopFeature;
 import me.dankofuk.commands.CommandLogViewer;
+import me.dankofuk.commands.FreezeCommand;
 import me.dankofuk.commands.StaffUtilsCommand;
 import me.dankofuk.discord.DiscordBot;
 import me.dankofuk.discord.commands.botRequiredCommands.BugCommand;
@@ -73,6 +74,7 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
     public CreativeDropLogger creativeDropLogger;
     public CommandLogViewer commandLogViewer;
     public StaffUtilsCommand staffUtilsCommand;
+    public FreezeCommand freezeCommand;
     // LiteBans
     public LBBanListener bansListener;
     public LBMuteListener lbMuteListener;
@@ -177,6 +179,27 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             Bukkit.getPluginManager().registerEvents(factionsTopAnnouncer, this);
             getLogger().warning("Factions Top Announcer - [Enabled]");
         }
+        // Freeze Command
+        this.freezeCommand = new FreezeCommand(config, this);
+        this.freezeCommand.setFreezeMessages(getConfig().getStringList("freeze.freezeMessages"));
+        this.freezeCommand.setNoPermissionMessage(getConfig().getString("freeze.noPermissionMessage"));
+        this.freezeCommand.setPlayerNotFoundMessage(getConfig().getString("freeze.playerNotFoundMessage"));
+        this.freezeCommand.setCannotFreezeOpPlayerMessage(getConfig().getString("freeze.cannotFreezeOpPlayerMessage"));
+        this.freezeCommand.setCannotFreezeSelfMessage(getConfig().getString("freeze.cannotFreezeSelfMessage"));
+        this.freezeCommand.setFreezeSuccessMessage(getConfig().getString("freeze.freezeSuccessMessage"));
+        this.freezeCommand.setUnfreezeSuccessMessage(getConfig().getString("freeze.unfreezeSuccessMessage"));
+        this.freezeCommand.setFrozenGUITitle(getConfig().getString("freeze.frozenGUITitle"));
+        this.freezeCommand.setFrozenGUIBarrierName(getConfig().getString("freeze.frozenGUIBarrierName"));
+        this.freezeCommand.setFrozenGUILore(getConfig().getString("freeze.frozenGUILore"));
+        this.freezeCommand.setCannotUseEnderpearlsOrChorusFruit(getConfig().getString("freeze.cannotUseEnderpearlsOrChorusFruit"));
+        this.freezeCommand.setCannotChat(getConfig().getString("freeze.cannotChat"));
+        this.freezeCommand.setCannotUseCommands(getConfig().getString("freeze.cannotUseCommands"));
+        this.freezeCommand.setCannotPlaceBlocks(getConfig().getString("freeze.cannotPlaceBlocks"));
+        this.freezeCommand.setCannotBreakBlocks(getConfig().getString("freeze.cannotBreakBlocks"));
+        this.freezeCommand.setDiscordServerMessage(getConfig().getString("freeze.discordServerMessage"));
+        this.freezeCommand.setLogoutCommand(getConfig().getString("freeze.logOutCommand"));
+        getCommand("freeze").setExecutor(this.freezeCommand);
+        getServer().getPluginManager().registerEvents(this.freezeCommand, this);
         // Player Report Command (Webhook + Command)
         if (!config.getBoolean("bot.enabled")) {
             getLogger().warning("Player Reporting Command - [Not Enabled] - (Requires Discord Bot enabled)");
