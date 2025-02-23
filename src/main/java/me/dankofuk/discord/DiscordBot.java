@@ -91,7 +91,7 @@ public class DiscordBot extends ListenerAdapter {
         this.jda.addEventListener(new ServerInfoCommand());
         this.jda.addEventListener(new SendVerifyPanel(this, main));
         this.jda.addEventListener(new FTopCommand(this));
-        this.jda.addEventListener(new TicketSystem(this));
+        //this.jda.addEventListener(new TicketSystem(this));
     }
 
     private Activity.ActivityType getActivityType(String activityTypeStr) {
@@ -192,7 +192,7 @@ public class DiscordBot extends ListenerAdapter {
                 start();
                 Bukkit.getLogger().warning("[Discord Bot] Starting Discord Bot...");
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Bukkit.getLogger().warning("[Discord Bot] Error starting bot.");
             }
         } else {
             Bukkit.getLogger().warning("[Discord Bot] Bot is disabled. Skipping initialization...");
