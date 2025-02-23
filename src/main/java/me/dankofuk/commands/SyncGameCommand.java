@@ -7,6 +7,7 @@ import me.dankofuk.utils.ColorUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -44,25 +45,31 @@ public class SyncGameCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+
+        if (!player.hasPermission("commandlogger.sync.use")) {
+            player.sendMessage(ColorUtils.translateColorCodes(Objects.requireNonNull(KushStaffUtils.getInstance().messagesConfig.getString("noPermissionMessage"))));
+            return true;
+        }
+
         if (args.length != 1) {
-            player.sendMessage(Objects.requireNonNull(KushStaffUtils.getInstance().syncingConfig.getString(ColorUtils.translateColorCodes("MESSAGES.COMMAND-USAGE-MESSAGE"))));
+            player.sendMessage(ColorUtils.translateColorCodes(Objects.requireNonNull(KushStaffUtils.getInstance().syncingConfig.getString("MESSAGES.COMMAND-USAGE-MESSAGE"))));
             return true;
         }
 
         String code = args[0];
         if (!sendPanel.isCodeValid(code)) {
-            player.sendMessage(Objects.requireNonNull(KushStaffUtils.getInstance().syncingConfig.getString(ColorUtils.translateColorCodes("MESSAGES.INVALID-CODE-MESSAGE"))));
+            player.sendMessage(ColorUtils.translateColorCodes(Objects.requireNonNull(KushStaffUtils.getInstance().syncingConfig.getString("MESSAGES.INVALID-CODE-MESSAGE"))));
             return true;
         }
 
         long discordUserId = sendPanel.getDiscordUserIdForCode(code);
 
         if (syncStorage.isUserSynced(discordUserId)) {
-            player.sendMessage(Objects.requireNonNull(KushStaffUtils.getInstance().syncingConfig.getString(ColorUtils.translateColorCodes("MESSAGES.ALREADY-SYNCED-MESSAGE"))));
+            player.sendMessage(ColorUtils.translateColorCodes(Objects.requireNonNull(KushStaffUtils.getInstance().syncingConfig.getString("MESSAGES.ALREADY-SYNCED-MESSAGE"))));
             return true;
         }
         assignRolesToDiscordUser(discordUserId, player);
-    player.sendMessage(Objects.requireNonNull(KushStaffUtils.getInstance().syncingConfig.getString(ColorUtils.translateColorCodes("MESSAGES.SYNCED-SUCCESSFULLY-MESSAGE"))));
+        player.sendMessage(ColorUtils.translateColorCodes(Objects.requireNonNull(KushStaffUtils.getInstance().syncingConfig.getString("MESSAGES.SYNCED-SUCCESSFULLY-MESSAGE"))));
         syncStorage.saveSyncData(discordUserId, player.getUniqueId());
         return true;
 

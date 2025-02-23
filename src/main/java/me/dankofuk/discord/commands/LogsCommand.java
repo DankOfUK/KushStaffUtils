@@ -13,6 +13,7 @@ import java.awt.*;
 import java.io.File;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.UUID;
 
 public class LogsCommand extends ListenerAdapter {
@@ -27,10 +28,8 @@ public class LogsCommand extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (event.getName().equals("logs")) {
-            String username = event.getOption("user").getAsString();
-
-            // Check if user has permissions to execute the command
-            boolean hasPermission = event.getMember().getRoles().stream()
+            String username = Objects.requireNonNull(event.getOption("user")).getAsString();
+            boolean hasPermission = Objects.requireNonNull(event.getMember()).getRoles().stream()
                     .anyMatch(role -> role.getId().equals(discordBot.getAdminRoleID()));
 
             if (!hasPermission) {
@@ -62,8 +61,6 @@ public class LogsCommand extends ListenerAdapter {
                 } else {
                     event.reply("Log file for " + username + " does not exist.").setEphemeral(true).queue();
                 }
-            } else {
-                return;
             }
         }
     }

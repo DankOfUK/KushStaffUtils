@@ -5,11 +5,8 @@ import me.dankofuk.discord.commands.*;
 import me.dankofuk.discord.listeners.CommandLogger;
 import me.dankofuk.discord.listeners.DiscordChat2Game;
 import me.dankofuk.discord.listeners.StartStopLogger;
-import me.dankofuk.discord.commands.SendRewardEmbedCommand;
-import me.dankofuk.discord.commands.SendSyncPanel;
 import me.dankofuk.discord.syncing.SyncStorage;
-import me.dankofuk.discord.commands.UnSyncCommand;
-import me.dankofuk.discord.verify.SendPanel;
+import me.dankofuk.discord.verify.SendVerifyPanel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -78,11 +75,11 @@ public class DiscordBot extends ListenerAdapter {
 
         // Register Events/Listeners
         this.jda.addEventListener(new HelpCommand(this));
-        this.jda.addEventListener(new ReloadCommand(this));
-        this.sendSyncPanel = new SendSyncPanel(this, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD"));
+        this.sendSyncPanel = new SendSyncPanel(this, syncStorage);
         this.jda.addEventListener(sendSyncPanel);
-        this.jda.addEventListener(new SendRewardEmbedCommand(this, config, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
-        this.jda.addEventListener(new UnSyncCommand(this, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
+        //this.jda.addEventListener(new VoteCommand(this));
+        this.jda.addEventListener(new SendRewardEmbedCommand(this, config, syncStorage));
+        this.jda.addEventListener(new UnSyncCommand(this, syncStorage));
         this.jda.addEventListener(new OnlinePlayersCommand(this));
         this.jda.addEventListener(new StartStopLogger(this));
         this.jda.addEventListener(new ConsoleCommand(this));
@@ -90,11 +87,11 @@ public class DiscordBot extends ListenerAdapter {
         this.jda.addEventListener(new LogsCommand(this));
         this.jda.addEventListener(new CommandLogger(this));
         this.jda.addEventListener(new DiscordChat2Game(main, config));
-        this.jda.addEventListener(new ReloadCommand(this));
         this.jda.addEventListener(new AvatarCommand());
         this.jda.addEventListener(new ServerInfoCommand());
-        this.jda.addEventListener(new SendPanel(this, main));
+        this.jda.addEventListener(new SendVerifyPanel(this, main));
         this.jda.addEventListener(new FTopCommand(this));
+        //this.jda.addEventListener(new TicketSystem(this));
     }
 
     private Activity.ActivityType getActivityType(String activityTypeStr) {
@@ -119,6 +116,7 @@ public class DiscordBot extends ListenerAdapter {
         commandsData.add(Commands.slash("sendrewardpanel", "Sends the reward panel to the channel you select").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
         commandsData.add(Commands.slash("unsync", "Unsync a user that has been synced").addOption(OptionType.USER, "user", "User you want to unsync"));
         commandsData.add(Commands.slash("reload", "Reloads the bot configs. (only bot related)"));
+        commandsData.add(Commands.slash("createticketpanel", "Sends the ticket panel to current channel.").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
         event.getJDA().updateCommands().addCommands(commandsData).queue();
     }
 
@@ -134,8 +132,9 @@ public class DiscordBot extends ListenerAdapter {
         commandsData.add(Commands.slash("sendverifypanel", "Sends the verify panel to the channel you select.").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
         commandsData.add(Commands.slash("sendsyncpanel", "Sends the sync panel to the channel you select").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
         commandsData.add(Commands.slash("sendrewardpanel", "Sends the reward panel to the channel you select").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
-        commandsData.add(Commands.slash("unsync", "Unsync a user that has been synced").addOption(OptionType.USER, "user", "User you want to unsync"));
+        commandsData.add(Commands.slash("unsync", "Unsync a user that has been synced").addOption(OptionType.USER, "user", "User you want to unsync").addOption(OptionType.CHANNEL, "channel", "The channel to send the panel to."));
         commandsData.add(Commands.slash("reload", "Reloads the bot configs. (only bot related)"));
+        commandsData.add(Commands.slash("createticketpanel", "Sends the ticket panel to current channel."));
         event.getJDA().updateCommands().addCommands(commandsData).queue();
     }
 
@@ -193,7 +192,7 @@ public class DiscordBot extends ListenerAdapter {
                 start();
                 Bukkit.getLogger().warning("[Discord Bot] Starting Discord Bot...");
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Bukkit.getLogger().warning("[Discord Bot] Error starting bot.");
             }
         } else {
             Bukkit.getLogger().warning("[Discord Bot] Bot is disabled. Skipping initialization...");
@@ -206,6 +205,10 @@ public class DiscordBot extends ListenerAdapter {
 
     public String getAdminRoleID() {
         return KushStaffUtils.getInstance().getConfig().getString("bot.adminRoleID");
+    }
+
+    public String getFactionTopCommandRoleID() {
+        return KushStaffUtils.getInstance().discordBotConfig.getString("bot.factionTopCommandRoleID");
     }
 
     public SendSyncPanel getSendPanel() {

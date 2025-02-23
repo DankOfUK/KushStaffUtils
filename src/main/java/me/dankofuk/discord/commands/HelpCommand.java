@@ -30,9 +30,9 @@ public class HelpCommand extends ListenerAdapter {
                 helpEmbed.addField("/sendverifypanel [channel]", "Sends the verify panel the selected channel.", true);
                 helpEmbed.addField("/logs [user]", "Shows the log file for the user selected", true);
                 helpEmbed.addField("/avatar [user]", "Shows the avatar for the user selected", true);
-                helpEmbed.addField("/sync", "Starts the syncing process!", true);
                 helpEmbed.addField("/unsync [user]", "Starts the syncing process!", true);
                 helpEmbed.addField("/sendsyncpanel [channel]", "Sends the sync panel the selected channel.", true);
+                helpEmbed.addField("/createticketpanel", "Sends the ticket panel the current channel.", true);
                 helpEmbed.addField("/sendrewardpanel [channel]", "Sends the reward panel the selected channel.", true);
                 helpEmbed.addField("/reload", "Reloads the configs for the bot related stuff.", false);
 

@@ -26,18 +26,12 @@ public class SendSyncPanel extends ListenerAdapter {
 
     public DiscordBot discordBot;
     private final Map<String, CodeData> codeDataMap = new ConcurrentHashMap<>();
-    public SyncStorage syncStorage;
-    public String Url;
-    public String Username;
-    public String Password;
+    private final SyncStorage syncStorage;
 
 
-    public SendSyncPanel(DiscordBot discordBot, String Url, String Username, String Password) {
+    public SendSyncPanel(DiscordBot discordBot, SyncStorage syncStorage) {
         this.discordBot = discordBot;
-        this.Url = Url;
-        this.Username = Username;
-        this.Password = Password;
-        this.syncStorage = new SyncStorage(Url, Username, Password);
+        this.syncStorage = new SyncStorage(KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD"));
     }
 
     @Override

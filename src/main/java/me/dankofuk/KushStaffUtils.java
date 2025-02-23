@@ -1,6 +1,10 @@
 package me.dankofuk;
 
+import com.golfing8.kore.FactionsKore;
+import com.golfing8.kore.feature.PrinterFeature;
+import com.golfing8.kore.topexpansion.feature.FactionsTopFeature;
 import me.dankofuk.commands.CommandLogViewer;
+import me.dankofuk.commands.FreezeCommand;
 import me.dankofuk.commands.StaffUtilsCommand;
 import me.dankofuk.discord.DiscordBot;
 import me.dankofuk.discord.commands.botRequiredCommands.BugCommand;
@@ -13,6 +17,9 @@ import me.dankofuk.commands.SyncGameCommand;
 import me.dankofuk.discord.syncing.SyncStorage;
 import me.dankofuk.factions.FactionStrike;
 import me.dankofuk.factions.FactionsTopAnnouncer;
+import me.dankofuk.fkore.FKoreEnterPrinterLogger;
+import me.dankofuk.fkore.FKoreFactionOvertakeLogger;
+import me.dankofuk.fkore.FKoreLeavePrinterLogger;
 import me.dankofuk.loggers.advancedbans.*;
 import me.dankofuk.loggers.creative.CreativeDropLogger;
 import me.dankofuk.loggers.creative.CreativeMiddleClickLogger;
@@ -42,12 +49,14 @@ import java.util.concurrent.TimeUnit;
 public class KushStaffUtils extends JavaPlugin implements Listener {
     private static String logsFolder;
     private static KushStaffUtils instance;
+    private static FactionsKore factionsKore;
     private JDA jda;
     private Plugin plugin;
 
     public FileConfiguration config;
     public FileConfiguration messagesConfig;
     public FileConfiguration syncingConfig;
+    public FileConfiguration discordBotConfig;
 
     public StartStopLogger startStopLogger;
     public CommandLogger commandLogger;
@@ -65,6 +74,7 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
     public CreativeDropLogger creativeDropLogger;
     public CommandLogViewer commandLogViewer;
     public StaffUtilsCommand staffUtilsCommand;
+    public FreezeCommand freezeCommand;
     // LiteBans
     public LBBanListener bansListener;
     public LBMuteListener lbMuteListener;
@@ -79,8 +89,13 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
     public AMuteListener aMuteListener;
     // Syncing
     public SyncStorage syncStorage;
-
-
+    // FKore
+    public FKoreLeavePrinterLogger printerLeaveLogger;
+    public FKoreEnterPrinterLogger printerEnterLogger;
+    public FKoreFactionOvertakeLogger overtakeLogger;
+    public FactionsKore fkore;
+    public PrinterFeature printerFeature;
+    public FactionsTopFeature factionsTopFeature;
     public void onEnable() {
         // Loading configuration
         FileConfiguration config = getConfig();
@@ -88,7 +103,10 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         saveDefaultConfig();
         messagesConfig = loadMessagesConfig();
         syncingConfig = loadSyncingConfig();
+        discordBotConfig = loadBotConfig();
         setDefaultMessages();
+        setBotMessages();
+        setSyncingConfig();
 
         // Instance
         instance = this;
@@ -146,9 +164,9 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         // Start/Stop Logger (Discord Bot Feature)
         if (!config.getBoolean("bot.enabled")) {
             getLogger().warning("Start/Stop Logger - [Not Enabled] - (Requires Discord Bot enabled)");
-            } else if (!config.getBoolean("serverstatus.enabled")) {
-                getLogger().warning("Start/Stop Logger - [Not Enabled] - (Requires Discord Bot enabled)");
-            } else {
+        } else if (!config.getBoolean("serverstatus.enabled")) {
+            getLogger().warning("Start/Stop Logger - [Not Enabled] - (Requires Discord Bot enabled)");
+        } else {
             this.startStopLogger = new StartStopLogger(discordBot);
             startStopLogger.sendStatusUpdateMessage(true);
             getLogger().warning("Start/Stop Logger - [Enabled]");
@@ -161,6 +179,27 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             Bukkit.getPluginManager().registerEvents(factionsTopAnnouncer, this);
             getLogger().warning("Factions Top Announcer - [Enabled]");
         }
+        // Freeze Command
+        this.freezeCommand = new FreezeCommand(config, this);
+        this.freezeCommand.setFreezeMessages(getConfig().getStringList("freeze.freezeMessages"));
+        this.freezeCommand.setNoPermissionMessage(getConfig().getString("freeze.noPermissionMessage"));
+        this.freezeCommand.setPlayerNotFoundMessage(getConfig().getString("freeze.playerNotFoundMessage"));
+        this.freezeCommand.setCannotFreezeOpPlayerMessage(getConfig().getString("freeze.cannotFreezeOpPlayerMessage"));
+        this.freezeCommand.setCannotFreezeSelfMessage(getConfig().getString("freeze.cannotFreezeSelfMessage"));
+        this.freezeCommand.setFreezeSuccessMessage(getConfig().getString("freeze.freezeSuccessMessage"));
+        this.freezeCommand.setUnfreezeSuccessMessage(getConfig().getString("freeze.unfreezeSuccessMessage"));
+        this.freezeCommand.setFrozenGUITitle(getConfig().getString("freeze.frozenGUITitle"));
+        this.freezeCommand.setFrozenGUIBarrierName(getConfig().getString("freeze.frozenGUIBarrierName"));
+        this.freezeCommand.setFrozenGUILore(getConfig().getString("freeze.frozenGUILore"));
+        this.freezeCommand.setCannotUseEnderpearlsOrChorusFruit(getConfig().getString("freeze.cannotUseEnderpearlsOrChorusFruit"));
+        this.freezeCommand.setCannotChat(getConfig().getString("freeze.cannotChat"));
+        this.freezeCommand.setCannotUseCommands(getConfig().getString("freeze.cannotUseCommands"));
+        this.freezeCommand.setCannotPlaceBlocks(getConfig().getString("freeze.cannotPlaceBlocks"));
+        this.freezeCommand.setCannotBreakBlocks(getConfig().getString("freeze.cannotBreakBlocks"));
+        this.freezeCommand.setDiscordServerMessage(getConfig().getString("freeze.discordServerMessage"));
+        this.freezeCommand.setLogoutCommand(getConfig().getString("freeze.logOutCommand"));
+        getCommand("freeze").setExecutor(this.freezeCommand);
+        getServer().getPluginManager().registerEvents(this.freezeCommand, this);
         // Player Report Command (Webhook + Command)
         if (!config.getBoolean("bot.enabled")) {
             getLogger().warning("Player Reporting Command - [Not Enabled] - (Requires Discord Bot enabled)");
@@ -190,7 +229,7 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(this.bugCommand, this);
             Objects.requireNonNull(getCommand("bug")).setExecutor(this.bugCommand);
             getLogger().warning("Bug Command - [Enabled]");
-            }
+        }
         // Join Leave Logger (Webhooks)
         if (!config.getBoolean("player_leave_join_logger.enabled")) {
             getLogger().warning("Player Join Leave Logger - [Not Enabled]");
@@ -231,7 +270,10 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         }
 
         // LiteBans Logging (Webhooks)
-        if (!config.getBoolean("litebans.enabled")) {
+        Plugin liteBans = pluginManager.getPlugin("LiteBans");
+        if (liteBans == null) {
+            getLogger().warning("LiteBans is not installed or enabled. This feature will not work!");
+        } else if (!config.getBoolean("litebans.enabled")) {
             getLogger().warning("LiteBans Logging - [Not Enabled]");
         } else {
             this.lbKickListener = new LBKickListener(this);
@@ -245,8 +287,11 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             getLogger().warning("LiteBans Logging - [Enabled]");
         }
 
-        // AdvacnedBans Logging (Webhooks)
-        if (!config.getBoolean("advancedbans.enabled")) {
+        // Advanced Logging (Webhooks)
+        Plugin advancedBans = pluginManager.getPlugin("AdvancedBans");
+        if (advancedBans == null) {
+            getLogger().warning("AdvancedBans is not installed or enabled. This feature will not work!");
+        } else if (!config.getBoolean("advancedbans.enabled")) {
             getLogger().warning("AdvancedBans Logging - [Not Enabled]");
         } else {
             this.aMuteListener = new AMuteListener(this);
@@ -264,11 +309,45 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             getLogger().warning("AdvancedBans Logging - [Enabled]");
         }
 
-        // Syncing Feature
-        syncStorage = new SyncStorage(KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD"));
-        syncStorage.initDatabase();
-        Objects.requireNonNull(getCommand("sync")).setExecutor(new SyncGameCommand(discordBot, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
-
+        if (!syncingConfig.getBoolean("enabled")) {
+            getLogger().warning("Discord 2 Game Syncing - [Not Enabled]");
+        } else {
+            syncStorage = new SyncStorage(syncingConfig.getString("MYSQL.URL"), syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD"));
+            syncStorage.initDatabase();
+            Objects.requireNonNull(getCommand("sync")).setExecutor(new SyncGameCommand(discordBot, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
+            getLogger().warning("Discord 2 Game Syncing - [Enabled]");
+        }
+        //Plugin factionsKore = pluginManager.getPlugin("FactionsKore");
+        //if (factionsKore == null) {
+        //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+        //} else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+        //    getLogger().info("FKore Leave Printer Logger - [Not Enabled]");
+        //} else {
+        //    PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
+        //    printerLeaveLogger = new FKoreLeavePrinterLogger(printerKore, this);
+        //    getServer().getPluginManager().registerEvents(printerLeaveLogger, this);
+        //    getLogger().info("FKore Leave Printer Logger - [Enabled]");
+        //}
+        //if (factionsKore == null) {
+        //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+        //} else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+        //    getLogger().info("FKore Enter Printer Logger - [Not Enabled]");
+        //} else {
+        //    PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
+        //    printerEnterLogger = new FKoreEnterPrinterLogger(printerKore, this);
+        //    getServer().getPluginManager().registerEvents(printerEnterLogger, this);
+        //    getLogger().info("FKore Enter Printer Logger - [Enabled]");
+        //}
+        //if (factionsKore == null) {
+        //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+        //} else if (!config.getBoolean("FKORE-OVERTAKE-LOGGER.enabled")) {
+        //    getLogger().info("FKore FTop Overtake Logger - [Not Enabled]");
+        //} else {
+        //    FactionsTopFeature factionsTopFeature = FactionsKore.get().getFeature(FactionsTopFeature.class);
+        //    overtakeLogger = new FKoreFactionOvertakeLogger(factionsTopFeature, this);
+        //    getServer().getPluginManager().registerEvents(overtakeLogger, this);
+        //    getLogger().info("FKore FTop Overtake Logger - [Enabled]");
+        //}
         this.staffUtilsCommand = new StaffUtilsCommand();
         Objects.requireNonNull(getCommand("stafflogger")).setExecutor(this.staffUtilsCommand);
         new ThreadPoolExecutor(5, 10, 1L, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
@@ -278,7 +357,11 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
     public void onDisable() {
         FileConfiguration config = getConfig();
         boolean discordBotEnabled = config.getBoolean("bot.enabled");
-        syncStorage.closeConnection();
+        if (!syncingConfig.getBoolean("enabled")) {
+            return;
+        } else {
+            syncStorage.closeConnection();
+        }
         if (discordBotEnabled) {
             this.discordBot.stop();
             getLogger().warning("[Discord Bot] Bot has been disabled!");
@@ -289,14 +372,13 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         if (factionsTopAnnouncer) {
             this.factionsTopAnnouncer.cancelAnnouncements();
         }
-        if (discordBotEnabled) {
-            if (config.getBoolean("serverstatus.enabled")) {
+        boolean stopLogger = config.getBoolean("serverstatus.enabled");
+        if (stopLogger) {
                 startStopLogger.sendStatusUpdateMessage(false);
             }
-        } else
-            getLogger().info("[Failed to start the start/stop logger]");
         Bukkit.getConsoleSender().sendMessage("[KushStaffUtils] Plugin has been disabled!");
     }
+
 
     public void reloadConfigOptions() {
         reloadConfig();
@@ -310,7 +392,6 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         // Instance Reloads
         instance = this;
 
-        // FileCommandLogger (Logging Folder)
         if (!config.getBoolean("per-user-logging.enabled")) {
             getLogger().warning("Per User Logging - [Not Enabled]");
         } else {
@@ -415,7 +496,10 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         }
 
         // LiteBans Logging (Webhooks)
-        if (!config.getBoolean("litebans.enabled")) {
+        Plugin liteBans = Bukkit.getPluginManager().getPlugin("LiteBans");
+        if (liteBans == null) {
+            getLogger().warning("LiteBans is not installed or enabled. This feature will not work!");
+        } else if (!config.getBoolean("litebans.enabled")) {
             getLogger().warning("LiteBans Logging - [Not Enabled]");
         } else {
             this.lbKickListener = new LBKickListener(this);
@@ -429,8 +513,11 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             getLogger().warning("LiteBans Logging - [Enabled]");
         }
 
-        // AdvacnedBans Logging (Webhooks)
-        if (!config.getBoolean("advancedbans.enabled")) {
+        // Advanced Logging (Webhooks)
+        Plugin advancedBans = Bukkit.getPluginManager().getPlugin("AdvancedBans");
+        if (advancedBans == null) {
+            getLogger().warning("AdvancedBans is not installed or enabled. This feature will not work!");
+        } else if (!config.getBoolean("advancedbans.enabled")) {
             getLogger().warning("AdvancedBans Logging - [Not Enabled]");
         } else {
             this.aMuteListener = new AMuteListener(this);
@@ -447,6 +534,46 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(aBanListener, this);
             getLogger().warning("AdvancedBans Logging - [Enabled]");
         }
+
+        if (!syncingConfig.getBoolean("ena//////////////bled")) {
+            getLogger().warning("Discord 2 Game Syncing - [Not Enabled]");
+        } else {
+            syncStorage = new SyncStorage(syncingConfig.getString("MYSQL.URL"), syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD"));
+            syncStorage.initDatabase();
+            Objects.requireNonNull(getCommand("sync")).setExecutor(new SyncGameCommand(discordBot, KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.URL"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.USERNAME"), KushStaffUtils.getInstance().syncingConfig.getString("MYSQL.PASSWORD")));
+            getLogger().warning("Discord 2 Game Syncing - [Enabled]");
+        }
+       //Plugin factionsKore = Bukkit.getPluginManager().getPlugin("FactionsKore");
+       //if (factionsKore == null) {
+       //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+       //} else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+       //    getLogger().info("FKore Leave Printer Logger - [Not Enabled]");
+       //} else {
+       //    PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
+       //    printerLeaveLogger = new FKoreLeavePrinterLogger(printerKore, this);
+       //    getServer().getPluginManager().registerEvents(printerLeaveLogger, this);
+       //    getLogger().info("FKore Leave Printer Logger - [Enabled]");
+       //}
+       //if (factionsKore == null) {
+       //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+       //} else if (!config.getBoolean("FKORE-OVERTAKE-LOGGER.enabled")) {
+       //    getLogger().info("FKore FTop Overtake Logger - [Not Enabled]");
+       //} else {
+       //    FactionsTopFeature factionsTopFeature = FactionsKore.get().getFeature(FactionsTopFeature.class);
+       //    overtakeLogger = new FKoreFactionOvertakeLogger(factionsTopFeature, this);
+       //    getServer().getPluginManager().registerEvents(overtakeLogger, this);
+       //    getLogger().info("FKore FTop Overtake Logger - [Enabled]");
+       //}
+       //if (factionsKore == null) {
+       //    getLogger().warning("FactionsKore is not installed or enabled. This feature will not work!");
+       //} else if (!config.getBoolean("PRINTER-LOGGER.enabled")) {
+       //    getLogger().info("FKore Enter Printer Logger - [Not Enabled]");
+       //} else {
+       //    PrinterFeature printerKore = FactionsKore.get().getFeature(PrinterFeature.class);
+       //    printerEnterLogger = new FKoreEnterPrinterLogger(printerKore, this);
+       //    getServer().getPluginManager().registerEvents(printerEnterLogger, this);
+       //    getLogger().info("FKore Enter Printer Logger - [Enabled]");
+       //}
         Bukkit.getConsoleSender().sendMessage("[KushStaffUtils] Config options have been reloaded!");
     }
 
@@ -493,11 +620,39 @@ public class KushStaffUtils extends JavaPlugin implements Listener {
         }
     }
 
+    public void setBotMessages() {
+        discordBotConfig.addDefault("bot.factionTopCommandRoleID", "faction-top-command-role-id");
+
+        discordBotConfig.options().copyDefaults(true);
+        saveBotConfig();
+    }
+
+    public void saveBotConfig() {
+        try {
+            discordBotConfig.save(new File(getDataFolder(), "discord-bot.yml"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public FileConfiguration loadBotConfig() {
+        saveResource("discord-bot.yml", false);
+
+        return YamlConfiguration.loadConfiguration(new File(getDataFolder(), "discord-bot.yml"));
+    }
+
+
+
     public static String getCommandLoggerFolder() {
         return logsFolder;
     }
 
+
     public static KushStaffUtils getInstance() {
         return instance;
+    }
+
+    public static FactionsKore getFKoreInstance() {
+        return factionsKore;
     }
 }
